@@ -225,6 +225,10 @@ public class TASDatabase {
         
     }
         
+    public Department getDepartment(int id) {
+        return null;
+    }
+        
     public Employee getEmployee(int id) {
         
         Employee employee = null;
@@ -328,5 +332,9 @@ public class TASDatabase {
         catch (Exception e) { e.printStackTrace(); }
         return employee;
         
+    }
+        
+    public int insertPunch(Punch p) {
+        return 0;
     }
 }

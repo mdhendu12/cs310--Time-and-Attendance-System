@@ -61,7 +61,7 @@ public class Punch {
         return terminalid;
     }
 
-    public PunchType getEventtypeid() {
+    public PunchType getPunchtype() {
         return eventtypeid;
     }
 
@@ -73,7 +73,7 @@ public class Punch {
         return badgeid;
     }
 
-    public LocalDateTime getTimestamp() {
+    public LocalDateTime getOriginalTimestamp() {
         return timestamp;
     }
 

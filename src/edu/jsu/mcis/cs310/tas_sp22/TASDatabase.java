@@ -226,7 +226,31 @@ public class TASDatabase {
     }
         
     public Department getDepartment(int id) {
-        return null;
+        Department dept = null;
+        String query = "SELECT * FROM department WHERE id=?";
+        boolean hasresults;
+        ResultSet resultset = null;
+        int terminalid;
+        String description;
+        
+        try {
+            PreparedStatement pstmt = connection.prepareStatement(query);
+            pstmt.setInt(1, id);
+            
+            hasresults = pstmt.execute();
+            if (hasresults) {
+                resultset = pstmt.getResultSet();
+                resultset.next();
+
+                terminalid = resultset.getInt("terminalid");
+                description = resultset.getString("description");
+                
+                dept = new Department(id, terminalid, description);
+            }
+        }
+        catch (Exception e) { e.printStackTrace(); }
+        
+        return dept;
     }
         
     public Employee getEmployee(int id) {

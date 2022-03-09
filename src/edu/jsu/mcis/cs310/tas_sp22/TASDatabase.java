@@ -321,7 +321,7 @@ public class TASDatabase {
     
     }
     
-        public Employee getEmployee(Badge badgeID) {
+    public Employee getEmployee(Badge badgeID) {
         
         Employee employee = null;
         String ID = badgeID.getId();
@@ -359,6 +359,10 @@ public class TASDatabase {
     }
         
     public int insertPunch(Punch p) {
+        int id = p.getId();
+        Department dept = this.getDepartment(id);
+        Employee emp = this.getEmployee(id);
+        
         return 0;
     }
 }

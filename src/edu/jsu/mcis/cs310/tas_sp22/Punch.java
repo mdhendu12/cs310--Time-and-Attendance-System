@@ -40,14 +40,49 @@ public class Punch {
     
     public void adjust(Shift s) {
         String day = timestamp.getDayOfWeek().toString();
+        
         LocalTime time = timestamp.toLocalTime();
         LocalTime shiftstart = s.getShiftstart();
+        LocalTime shiftstop = s.getShiftstop();
+        LocalTime lunchstart = s.getLunchstart();
+        LocalTime lunchstop = s.getLunchstop();
         LocalTime adjuster = null;
-        if (!"TIME OUT".equals(eventtypeid.toString()) && !"SATURDAY".equals(day) && !"SUNDAY".equals(day)) {
-            adjustedTS.withHour(adjuster.getHour());
-            adjustedTS.withMinute(adjuster.getMinute());
-            adjustedTS.withSecond(adjuster.getSecond());
-            adjustedTS.withNano(adjuster.getNano());
+        
+        Boolean inlunchbreak = time.isAfter(lunchstart) && time.isBefore(lunchstop);
+        Boolean isntweekend = !"SATURDAY".equals(day) && !"SUNDAY".equals(day);
+        
+        String eventString = eventtypeid.toString();
+        
+        int roundinterval = s.getRoundinterval();
+        
+        if (!"TIME OUT".equals(eventString) && isntweekend) {
+            // Shift start rule
+            if (time.isBefore(shiftstart) && time.isAfter(shiftstart.minusMinutes(roundinterval))) { 
+                adjuster = shiftstart;
+                adjustmenttype = "Shift Start";
+            }
+            else if (time.isAfter(shiftstop) && time.isBefore(shiftstop.plusMinutes(roundinterval))) { 
+                adjuster = shiftstop;
+                adjustmenttype = "Shift Stop";
+            }
+            else if (inlunchbreak) {
+                if ("CLOCK OUT".equals(eventString)) { 
+                    adjuster = lunchstart;
+                    adjustmenttype = "Lunch Start";
+                }
+                else { 
+                    adjuster = lunchstop; 
+                    adjustmenttype = "Lunch Stop";
+                }
+            }
+            adjustedTS = timestamp;
+            adjustedTS = adjustedTS.withHour(adjuster.getHour());
+            adjustedTS = adjustedTS.withMinute(adjuster.getMinute());
+            adjustedTS = adjustedTS.withSecond(adjuster.getSecond());
+            adjustedTS = adjustedTS.withNano(adjuster.getNano());
+        }
+        else {
+            
         }
         
     }
@@ -64,6 +99,17 @@ public class Punch {
         sb.append(eventtypeid);
         sb.append(": ").append(timestamp.getDayOfWeek().toString().substring(0, 3)).append(" ");    // substring is used to shorten day of week string (e.g. "THURSDAY" -> "THU")
         sb.append(DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm:ss").format(timestamp));    // format timestamp properly for output
+        
+        return sb.toString();
+    }
+    public String printAdjusted() {
+        StringBuilder sb = new StringBuilder();
+        
+        sb.append("#").append(badgeid).append(" ");
+        sb.append(eventtypeid);
+        sb.append(": ").append(adjustedTS.getDayOfWeek().toString().substring(0, 3)).append(" ");    // substring is used to shorten day of week string (e.g. "THURSDAY" -> "THU")
+        sb.append(DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm:ss").format(adjustedTS));    // format timestamp properly for output
+        sb.append(" (").append(adjustmenttype).append(")");
         
         return sb.toString();
     }

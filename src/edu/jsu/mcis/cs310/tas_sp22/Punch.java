@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
+import java.lang.Math;
 
 public class Punch {
     private int id, terminalid;
@@ -48,6 +49,8 @@ public class Punch {
         LocalTime lunchstop = s.getLunchstop();
         LocalTime adjuster = null;
         
+        adjustedTS = timestamp;
+        
         Boolean inlunchbreak = time.isAfter(lunchstart) && time.isBefore(lunchstop);
         Boolean isntweekend = !"SATURDAY".equals(day) && !"SUNDAY".equals(day);
         
@@ -56,6 +59,16 @@ public class Punch {
         int roundinterval = s.getRoundinterval();
         
         if (!"TIME OUT".equals(eventString) && isntweekend) {
+                       
+            //None Rule
+           
+            int intervalRound = s.getRoundinterval();
+            
+            if (timestamp.getMinute() % intervalRound == 0) {
+                adjuster = timestamp.toLocalTime().withSecond(0);
+                adjustmenttype = "None";
+            }
+            
             // Shift start rule
             if (time.isBefore(shiftstart) && time.isAfter(shiftstart.minusMinutes(roundinterval))) { 
                 adjuster = shiftstart;
@@ -75,16 +88,104 @@ public class Punch {
                     adjustmenttype = "Lunch Stop";
                 }
             }
+            //Grace Period Rule
+            
+            int graceperiod = s.getGraceperiod();
+            
+            //Checks if the shift was entered during the grace period for clock-in punches.
+            
+            if (time.isAfter(shiftstart) && time.isBefore(shiftstart.plusMinutes(graceperiod))) { 
+                adjuster = shiftstart;
+                adjustmenttype = "Shift Start";
+            }
+            
+            //Checks if the shift was entered during the grace period for clock-out punches.
+            
+            else if (time.isBefore(shiftstop) && time.isAfter(shiftstop.minusMinutes(graceperiod))) { 
+                adjuster = shiftstop;
+                adjustmenttype = "Shift Stop";
+            }
+            
+            //Dock Penalty Rule
+            
+            int dockPenalty = s.getDockpenalty();
+            LocalTime inDockInterval = shiftstart.plusMinutes(graceperiod);
+            LocalTime endInDockInterval = shiftstart.plusMinutes(dockPenalty);
+            LocalTime outDockInterval = shiftstop.minusMinutes(graceperiod);
+            LocalTime endOutDockInterval = shiftstop.minusMinutes(dockPenalty);
+            
+            //This if statement checks if the punch was entered outside the grace period for a clock in.
+            
+            if (time.isAfter(inDockInterval) && time.isBefore(endInDockInterval)) {
+                adjuster = shiftstart.plusMinutes(dockPenalty);
+                adjustmenttype = "Shift Dock";
+            }
+            
+            //This if statement checks if the punch was entered outside the grace period for clock out.
+            
+            else if (time.isBefore(outDockInterval) && time.isAfter(endOutDockInterval.minusSeconds(1))) {
+                adjuster = shiftstop.minusMinutes(dockPenalty);
+                adjustmenttype = "Shift Dock";
+            }
+            
+            if (adjustmenttype == null) {adjuster = intervalRound(adjuster, s);}
+            
             adjustedTS = timestamp;
+            
+            
+            
+            
             adjustedTS = adjustedTS.withHour(adjuster.getHour());
             adjustedTS = adjustedTS.withMinute(adjuster.getMinute());
             adjustedTS = adjustedTS.withSecond(adjuster.getSecond());
-            adjustedTS = adjustedTS.withNano(adjuster.getNano());
-        }
-        else {
             
         }
         
+        else {
+            
+              adjuster = intervalRound(adjuster, s);
+              adjustedTS = adjustedTS.withHour(adjuster.getHour());
+              adjustedTS = adjustedTS.withMinute(adjuster.getMinute());
+              adjustedTS = adjustedTS.withSecond(adjuster.getSecond());
+                
+        }
+        
+    }
+    
+    private LocalTime intervalRound(LocalTime adjuster, Shift s) {
+                
+                int intervalRound = s.getRoundinterval();
+                adjustmenttype = "Interval Round";
+                int minute = timestamp.getMinute();
+                int adjustedminute;
+                
+               
+                //Interval Round Rule
+                
+                if (minute % intervalRound !=0) {
+                    
+                    if ((minute % intervalRound) < (intervalRound/2)) {
+                        adjustedminute = (Math.round(minute/intervalRound) * intervalRound);
+                    }
+                    
+                    else {
+                        adjustedminute = (Math.round(minute/intervalRound) * intervalRound) + intervalRound;
+                    }
+                    
+                    if (adjustedminute != 60) {
+                        adjuster = timestamp.toLocalTime().withMinute(adjustedminute); 
+                    }
+                    
+                    else {
+                        adjuster = timestamp.toLocalTime().plusHours(1).withMinute(0);
+                    }
+         
+                    adjuster = adjuster.withSecond(0);
+                    
+                }
+                
+                return adjuster;
+                
     }
     
     @Override

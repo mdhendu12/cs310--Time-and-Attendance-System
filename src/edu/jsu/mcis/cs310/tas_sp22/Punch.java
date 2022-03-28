@@ -132,9 +132,6 @@ public class Punch {
             
             adjustedTS = timestamp;
             
-            
-            
-            
             adjustedTS = adjustedTS.withHour(adjuster.getHour());
             adjustedTS = adjustedTS.withMinute(adjuster.getMinute());
             adjustedTS = adjustedTS.withSecond(adjuster.getSecond());
@@ -158,8 +155,7 @@ public class Punch {
                 adjustmenttype = "Interval Round";
                 int minute = timestamp.getMinute();
                 int adjustedminute;
-                
-               
+                             
                 //Interval Round Rule
                 
                 if (minute % intervalRound !=0) {

@@ -101,7 +101,7 @@ public class Punch {
             
             //Checks if the shift was entered during the grace period for clock-out punches.
             
-            else if (time.isBefore(shiftstop) && time.isAfter(shiftstop.minusMinutes(graceperiod))) { 
+            else if (time.isBefore(shiftstop) && time.isAfter(shiftstop.minusMinutes(graceperiod).minusSeconds(1))) { 
                 adjuster = shiftstop;
                 adjustmenttype = "Shift Stop";
             }

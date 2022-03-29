@@ -2,6 +2,7 @@ package edu.jsu.mcis.cs310.tas_sp22;
 import java.sql.*;
 import java.util.HashMap;
 import java.time.*;
+import java.util.ArrayList;
 
 public class TASDatabase {
     
@@ -329,4 +330,51 @@ public class TASDatabase {
         return employee;
         
     }
+        
+        public ArrayList<Punch> getDailyPunchList(Badge badge, LocalDate tsdate) {
+            
+            ArrayList punchlist = new ArrayList<Punch>();
+            Punch punch;
+            String query = null;
+            ResultSet resultset = null;
+            PreparedStatement pstmt = null;
+            
+            boolean hasresults;
+            String badgeID = badge.getId();
+            int punchID;
+            
+            
+            try{
+                
+                if (connection.isValid(0)) {
+                    query = "SELECT *, DATE(`timestamp`) AS tsdate FROM event "
+                            + "WHERE badgeid = ? HAVING tsdate = ? ORDER BY `timestamp`;";
+                    pstmt = connection.prepareStatement(query);
+                    pstmt.setString(1, badgeID);
+                    pstmt.setString(2, tsdate.toString());
+                    
+                    hasresults = pstmt.execute();
+                    
+                    if (hasresults) {
+                    
+                        resultset = pstmt.getResultSet();
+
+                        while(resultset.next()) {
+                            
+                            punchID = resultset.getInt("id");
+                            punch = getPunch(punchID);
+                            punchlist.add(punch);
+                            
+                        }
+                    }
+
+                }
+            }
+            
+            catch (Exception e) { e.printStackTrace(); }
+            
+            return punchlist;
+            
+        }              
 }
+

@@ -1,7 +1,5 @@
 package edu.jsu.mcis.cs310.tas_sp22;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import org.junit.*;
 import static org.junit.Assert.*;
 

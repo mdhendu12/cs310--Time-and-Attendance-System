@@ -42,9 +42,6 @@ public class TASDatabase {
                 
                 for (int i = 1; i <= rsmd.getColumnCount(); i++) {
                     hm.put(rsmd.getColumnName(i), resultset.getString(i));  // key = table column header; value is row result
-                    if (rsmd.getColumnName(i) == "badgeid") {
-                        badge = this.getBadge(resultset.getString(i));
-                    }
                 }
                 
                 punch = new Punch(hm, badge);  // new Punch object created with hashmap

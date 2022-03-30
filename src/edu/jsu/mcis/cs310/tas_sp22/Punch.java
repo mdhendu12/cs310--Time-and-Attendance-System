@@ -17,14 +17,15 @@ public class Punch {
         this.terminalid = terminalid;
         this.badge = badge;
         this.eventtypeid = PunchType.values()[eventtypeid];
+        this.badgeid = this.badge.getId();
         
         // other fields set to zero or null
         id = 0;
-        adjustmenttype = badgeid = null;
+        adjustmenttype = null;
         timestamp = adjustedTS = null;
     }
     
-    public Punch(HashMap<String, String> params) {
+    public Punch(HashMap<String, String> params, Badge b) {
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         timestamp = LocalDateTime.parse(params.get("timestamp"), dtf);
 
@@ -32,10 +33,10 @@ public class Punch {
         terminalid = Integer.valueOf(params.get("terminalid"));
         eventtypeid = PunchType.values()[Integer.parseInt(params.get("eventtypeid"))];
         badgeid = params.get("badgeid");
-        
+        badge = b;
+
         // fields not retrieved by getPunch set to zero or null
         adjustedTS = null;
-        badge = null;
         adjustmenttype = null;
     }
     

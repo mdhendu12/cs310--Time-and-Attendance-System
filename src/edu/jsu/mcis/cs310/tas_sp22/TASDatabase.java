@@ -359,10 +359,38 @@ public class TASDatabase {
     }
         
     public int insertPunch(Punch p) {
-        int id = p.getId();
-        Department dept = this.getDepartment(id);
-        Employee emp = this.getEmployee(id);
+        int newID = 0; 
+        Badge badge = getBadge(p.getBadge().getId()); 
+        Employee employee = getEmployee(badge); 
+        Department department = getDepartment(employee.getDepartmentid()); 
+        PreparedStatement pstmt; 
+        String query;
+        ResultSet resultset; 
         
-        return 0;
+        if(p.getTerminalid() == department.getTerminalid() || p.getTerminalid() ==0)
+        {
+            try 
+            {
+                query = "INSERT INTO event (terminalid, badgeid, timestamp, eventtypeid) VALUES (?, ?, ?, ?)"; 
+                pstmt = connection.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS); 
+                pstmt.setInt(1, p.getTerminalid());
+                pstmt.setString(2, p.getBadge().getId());
+                pstmt.setString(3, p.getOriginalTimestamp().toString());
+                pstmt.setInt(4, p.getPunchtype().ordinal());
+                
+                int result = pstmt.executeUpdate(); 
+                
+                if (result ==1)
+                {
+                    resultset = pstmt.getGeneratedKeys(); 
+                    if (resultset.next())
+                    {
+                        newID = resultset.getInt(1); 
+                    }
+                }
+            }
+            catch (Exception e) {e.printStackTrace();} 
+        }
+        return newID; 
     }
 }

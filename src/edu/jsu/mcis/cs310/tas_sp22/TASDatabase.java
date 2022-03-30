@@ -37,10 +37,17 @@ public class TASDatabase {
                 resultset = pstmt.getResultSet();
                 resultset.next();
                 rsmd = resultset.getMetaData();
-                for (int i = 1; i <= 5; i++) {
+                
+                Badge badge = getBadge(resultset.getString("badgeid"));
+                
+                for (int i = 1; i <= rsmd.getColumnCount(); i++) {
                     hm.put(rsmd.getColumnName(i), resultset.getString(i));  // key = table column header; value is row result
+                    if (rsmd.getColumnName(i) == "badgeid") {
+                        badge = this.getBadge(resultset.getString(i));
+                    }
                 }
-                punch = new Punch(hm);  // new Punch object created with hashmap
+                
+                punch = new Punch(hm, badge);  // new Punch object created with hashmap
             }
         }
         catch (Exception e) { e.printStackTrace(); }

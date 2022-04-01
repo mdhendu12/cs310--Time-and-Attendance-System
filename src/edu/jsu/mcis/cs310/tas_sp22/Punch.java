@@ -18,16 +18,18 @@ public class Punch {
         this.badge = badge;
         this.eventtypeid = PunchType.values()[eventtypeid];
         this.badgeid = this.badge.getId();
+        this.timestamp = LocalDateTime.now().withNano(0);
         
         // other fields set to zero or null
         id = 0;
         adjustmenttype = null;
-        timestamp = adjustedTS = null;
+        adjustedTS = null;
     }
     
     public Punch(HashMap<String, String> params, Badge b) {
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        timestamp = LocalDateTime.parse(params.get("timestamp"), dtf);
+        timestamp = LocalDateTime.parse(params.get("timestamp"), dtf).withNano(0);
+        
 
         id = Integer.valueOf(params.get("id"));
         terminalid = Integer.valueOf(params.get("terminalid"));
@@ -220,7 +222,7 @@ public class Punch {
         return terminalid;
     }
 
-    public PunchType getEventtypeid() {
+    public PunchType getPunchtype() {
         return eventtypeid;
     }
 
@@ -232,7 +234,7 @@ public class Punch {
         return badgeid;
     }
 
-    public LocalDateTime getTimestamp() {
+    public LocalDateTime getOriginalTimestamp() {
         return timestamp;
     }
 

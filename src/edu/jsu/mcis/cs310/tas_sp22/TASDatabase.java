@@ -230,6 +230,34 @@ public class TASDatabase {
         
     }
         
+    public Department getDepartment(int id) {
+        Department dept = null;
+        String query = "SELECT * FROM department WHERE id=?";
+        boolean hasresults;
+        ResultSet resultset = null;
+        int terminalid;
+        String description;
+        
+        try {
+            PreparedStatement pstmt = connection.prepareStatement(query);
+            pstmt.setInt(1, id);
+            
+            hasresults = pstmt.execute();
+            if (hasresults) {
+                resultset = pstmt.getResultSet();
+                resultset.next();
+
+                terminalid = resultset.getInt("terminalid");
+                description = resultset.getString("description");
+                
+                dept = new Department(id, terminalid, description);
+            }
+        }
+        catch (Exception e) { e.printStackTrace(); }
+        
+        return dept;
+    }
+        
     public Employee getEmployee(int id) {
         
         Employee employee = null;
@@ -298,7 +326,7 @@ public class TASDatabase {
     
     }
     
-        public Employee getEmployee(Badge badgeID) {
+    public Employee getEmployee(Badge badgeID) {
         
         Employee employee = null;
         String ID = badgeID.getId();
@@ -335,7 +363,44 @@ public class TASDatabase {
         
     }
         
-        public ArrayList<Punch> getDailyPunchList(Badge badge, LocalDate tsdate) {
+    public int insertPunch(Punch p) {
+        int newID = 0; 
+        Badge badge = getBadge(p.getBadge().getId()); 
+        Employee employee = getEmployee(badge); 
+        Department department = getDepartment(employee.getDepartmentid()); 
+        PreparedStatement pstmt; 
+        String query;
+        ResultSet resultset; 
+        
+        if(p.getTerminalid() == department.getTerminalid() || p.getTerminalid() ==0)
+        {
+            try 
+            {
+                query = "INSERT INTO event (terminalid, badgeid, timestamp, eventtypeid) VALUES (?, ?, ?, ?)"; 
+                pstmt = connection.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS); 
+                pstmt.setInt(1, p.getTerminalid());
+                pstmt.setString(2, p.getBadge().getId());
+                pstmt.setString(3, p.getOriginalTimestamp().withNano(0).toString());
+                pstmt.setInt(4, p.getPunchtype().ordinal());
+                
+                int result = pstmt.executeUpdate(); 
+                
+                if (result ==1)
+                {
+                    resultset = pstmt.getGeneratedKeys(); 
+                    if (resultset.next())
+                    {
+                        newID = resultset.getInt(1); 
+                    }
+                }
+            }
+            catch (Exception e) {e.printStackTrace();} 
+        }
+        return newID; 
+    }
+
+        
+    public ArrayList<Punch> getDailyPunchList(Badge badge, LocalDate tsdate) {
             
             ArrayList punchlist = new ArrayList<Punch>();
             Punch punch;
@@ -381,4 +446,3 @@ public class TASDatabase {
             
         }              
 }
-

@@ -39,7 +39,6 @@ public class TASDatabase {
                 rsmd = resultset.getMetaData();
                 
                 Badge badge = getBadge(resultset.getString("badgeid"));
-                Badge badge = getBadge(resultset.getString("badgeid")); 
                 
                 for (int i = 1; i <= rsmd.getColumnCount(); i++) {
                     hm.put(rsmd.getColumnName(i), resultset.getString(i));  // key = table column header; value is row result
@@ -381,7 +380,7 @@ public class TASDatabase {
                 pstmt = connection.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS); 
                 pstmt.setInt(1, p.getTerminalid());
                 pstmt.setString(2, p.getBadge().getId());
-                pstmt.setString(3, p.getOriginalTimestamp().toString());
+                pstmt.setString(3, p.getOriginalTimestamp().withNano(0).toString());
                 pstmt.setInt(4, p.getPunchtype().ordinal());
                 
                 int result = pstmt.executeUpdate(); 

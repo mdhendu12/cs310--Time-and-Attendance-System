@@ -142,11 +142,10 @@ public class Punch {
         }
         
         else {
-            
-              adjuster = intervalRound(adjuster, s);
-              adjustedTS = adjustedTS.withHour(adjuster.getHour());
-              adjustedTS = adjustedTS.withMinute(adjuster.getMinute());
-              adjustedTS = adjustedTS.withSecond(adjuster.getSecond());
+            adjuster = intervalRound(timestamp.toLocalTime(), s);
+            adjustedTS = adjustedTS.withHour(adjuster.getHour());
+            adjustedTS = adjustedTS.withMinute(adjuster.getMinute());
+            adjustedTS = adjustedTS.withSecond(adjuster.getSecond());
                 
         }
         

@@ -9,43 +9,82 @@ public class TAS {
     
         TASDatabase db = new TASDatabase();
         Punch p = db.getPunch(3634);
-        //System.out.println(p);
         Badge b = p.getBadge();
-        //System.out.println(b);
         Shift s = db.getShift(b);
-        //System.out.println(s);
         
         ArrayList<Punch> dailypunchlist = db.getDailyPunchList(b, p.getOriginalTimestamp().toLocalDate());
         
         for (Punch punch : dailypunchlist) {
             punch.adjust(s);
-            System.out.println(punch.printAdjusted());
         }
-        System.out.println(dailypunchlist.toString());
+        
         /* Compute Pay Period Total */
         
         int m = TAS.calculateTotalMinutes(dailypunchlist, s);
-        System.out.println(m);
+        
     }
     
     public static int calculateTotalMinutes(ArrayList<Punch> dailypunchlist, Shift shift) {
         
         int totalMinutes = 0;
-        Iterator<Punch> currentPunch = dailypunchlist.iterator();
+        Punch inPunch = null;
+        Punch outPunch = null;
+        Punch firstPunch = null;
+        Punch secondPunch = null;
+        boolean clockout = true;
+        ArrayList<Punch> pair = new ArrayList(2);
+        Duration minutes;
+        Iterator<Punch> it = dailypunchlist.iterator();
         
-        while (currentPunch.hasNext()) {
-        
-            Punch inPunch = currentPunch.next();
-            System.out.println(inPunch);
-            Punch outPunch = currentPunch.next();
-            System.out.println(outPunch);
-            Duration minutes = Duration.between(inPunch.getAdjustedTS(), outPunch.getAdjustedTS());
-            totalMinutes += minutes.toMinutes();
-        
+        if (dailypunchlist.size() > 1) {
+            System.out.println(dailypunchlist);
+            while (it.hasNext()) {
+
+                if (clockout) {
+                    firstPunch = it.next();
+                    pair.add(firstPunch);
+                    System.out.println(firstPunch);
+                }
+
+                else {
+                    clockout = true; 
+                    break;
+                }
+
+                    secondPunch = it.next();
+
+                if (secondPunch.getPunchtype().toString() == "CLOCK IN") {
+                    firstPunch = secondPunch;
+                    clockout = false;                
+                    break;
+                }
+
+                else {
+
+                    if (secondPunch.toString() == "TIME OUT") {break;}
+                    else {pair.add(secondPunch);};
+                    System.out.println(firstPunch);
+                    //if (pair.get(pair.size() - 1).)
+                    minutes = Duration.between(firstPunch.getAdjustedTS(), secondPunch.getAdjustedTS());
+                    totalMinutes += minutes.toMinutes();
+
+
+                }
+                }
         }
 
-        return totalMinutes;
+
+
+
+            if (totalMinutes > shift.getLunchthreshold().getMinute() && secondPunch.getAdjustedTS().toLocalTime() == shift.getLunchstart()) {
+                return totalMinutes - shift.getLunchduration().toMinutesPart();
+            }
+
+            else {return totalMinutes;}
         
-    }
-            
+        }
 }
+
+        
+    
+    

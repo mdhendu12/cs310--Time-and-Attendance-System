@@ -15,7 +15,7 @@ public class TAS {
         Shift s = db.getShift(b);
         //System.out.println(s);
         
-        ArrayList<Punch> dailypunchlist = db.getDailyPunchList(b, p.getTimestamp().toLocalDate());
+        ArrayList<Punch> dailypunchlist = db.getDailyPunchList(b, p.getOriginalTimestamp().toLocalDate());
         
         for (Punch punch : dailypunchlist) {
             punch.adjust(s);

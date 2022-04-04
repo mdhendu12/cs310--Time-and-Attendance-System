@@ -32,7 +32,6 @@ public class TAS {
         Punch firstPunch = null;
         Punch secondPunch = null;
         boolean clockout = true;
-        ArrayList<Punch> pair = new ArrayList(2);
         Duration minutes;
         Iterator<Punch> it = dailypunchlist.iterator();
         
@@ -42,7 +41,6 @@ public class TAS {
 
                 if (clockout) {
                     firstPunch = it.next();
-                    pair.add(firstPunch);
                     System.out.println(firstPunch);
                 }
 
@@ -62,21 +60,19 @@ public class TAS {
                 else {
 
                     if (secondPunch.toString() == "TIME OUT") {break;}
-                    else {pair.add(secondPunch);};
+                    
                     System.out.println(firstPunch);
-                    //if (pair.get(pair.size() - 1).)
                     minutes = Duration.between(firstPunch.getAdjustedTS(), secondPunch.getAdjustedTS());
                     totalMinutes += minutes.toMinutes();
+                    System.out.println(totalMinutes);
 
 
                 }
                 }
         }
 
-
-
-
-            if (totalMinutes > shift.getLunchthreshold().getMinute() && secondPunch.getAdjustedTS().toLocalTime() == shift.getLunchstart()) {
+            if (totalMinutes > shift.getLunchthreshold() && secondPunch.getAdjustedTS().toLocalTime() != shift.getLunchstart()) {
+                System.out.println(totalMinutes);
                 return totalMinutes - shift.getLunchduration().toMinutesPart();
             }
 

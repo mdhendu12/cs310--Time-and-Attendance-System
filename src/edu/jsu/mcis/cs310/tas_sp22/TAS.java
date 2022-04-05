@@ -6,29 +6,12 @@ import org.junit.Before;
 public class TAS {
     
     public static void main(String[] args) {
-    
-        TASDatabase db = new TASDatabase();
-        Punch p = db.getPunch(3634);
-        Badge b = p.getBadge();
-        Shift s = db.getShift(b);
-        
-        ArrayList<Punch> dailypunchlist = db.getDailyPunchList(b, p.getOriginalTimestamp().toLocalDate());
-        
-        for (Punch punch : dailypunchlist) {
-            punch.adjust(s);
-        }
-        
-        /* Compute Pay Period Total */
-        
-        int m = TAS.calculateTotalMinutes(dailypunchlist, s);
         
     }
     
     public static int calculateTotalMinutes(ArrayList<Punch> dailypunchlist, Shift shift) {
         
         int totalMinutes = 0;
-        Punch inPunch = null;
-        Punch outPunch = null;
         Punch firstPunch = null;
         Punch secondPunch = null;
         boolean clockout = true;
@@ -36,48 +19,54 @@ public class TAS {
         Iterator<Punch> it = dailypunchlist.iterator();
         
         if (dailypunchlist.size() > 1) {
-            System.out.println(dailypunchlist);
+            
             while (it.hasNext()) {
 
                 if (clockout) {
                     firstPunch = it.next();
-                    System.out.println(firstPunch);
                 }
 
                 else {
-                    clockout = true; 
-                    break;
+                    clockout = true;
                 }
 
-                    secondPunch = it.next();
-
+                if (it.hasNext()) {secondPunch = it.next();}
+                else {break;}
+                
                 if (secondPunch.getPunchtype().toString() == "CLOCK IN") {
                     firstPunch = secondPunch;
-                    clockout = false;                
-                    break;
+                    clockout = false;
                 }
 
                 else {
 
                     if (secondPunch.toString() == "TIME OUT") {break;}
                     
-                    System.out.println(firstPunch);
-                    minutes = Duration.between(firstPunch.getAdjustedTS(), secondPunch.getAdjustedTS());
-                    totalMinutes += minutes.toMinutes();
-                    System.out.println(totalMinutes);
-
+                    else {
+                        minutes = Duration.between(firstPunch.getAdjustedTS(), secondPunch.getAdjustedTS());
+                        totalMinutes += minutes.toMinutes();
+                    }
 
                 }
                 }
         }
+        
+        else {return totalMinutes;}
 
-            if (totalMinutes > shift.getLunchthreshold() && secondPunch.getAdjustedTS().toLocalTime() != shift.getLunchstart()) {
-                System.out.println(totalMinutes);
+        if (secondPunch.getOriginalTimestamp().getDayOfWeek().toString() != "SATURDAY" && secondPunch.getOriginalTimestamp().getDayOfWeek().toString() != "SUNDAY") {
+            
+            if (totalMinutes > shift.getLunchthreshold() && secondPunch.getAdjustmenttype() == "Lunch Start") {
+                return totalMinutes - shift.getLunchduration().toMinutesPart();
+            }
+            
+            else if (totalMinutes > shift.getLunchthreshold() && (!firstPunch.getAdjustmenttype().equals("Lunch Stop")) && (!secondPunch.getAdjustmenttype().equals("Lunch Start"))) {
                 return totalMinutes - shift.getLunchduration().toMinutesPart();
             }
 
             else {return totalMinutes;}
-        
+            }
+
+        else {return totalMinutes;}
         }
 }
 

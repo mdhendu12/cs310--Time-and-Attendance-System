@@ -9,18 +9,18 @@ import org.json.simple.*;
 public class TAS {
     
     public static void main(String[] args) {
-        
-        System.out.println("Hello World");
-        
+            
     }
           
     public static String getPunchListAsJSON(ArrayList<Punch> dailypunchlist) {
+        
         ArrayList<HashMap<String, String>> jsonData = new ArrayList<HashMap<String, String>>();
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("E MM/dd/yyyy HH:mm:ss");
         
         for (Punch p : dailypunchlist) {
                     
             HashMap<String, String> punchData = new HashMap<>();
+            
             punchData.put("id", String.valueOf(p.getId()));
             punchData.put("badgeid", String.valueOf(p.getBadgeid()));
             punchData.put("terminalid", String.valueOf(p.getTerminalid()));
@@ -28,11 +28,13 @@ public class TAS {
             punchData.put("adjustmenttype", String.valueOf(p.getAdjustmenttype()));
             punchData.put("originaltimestamp", String.valueOf(p.getOriginalTimestamp().format(dtf).toUpperCase()));
             punchData.put("adjustedtimestamp", String.valueOf(p.getAdjustedTS().format(dtf).toUpperCase()));
+            
             jsonData.add(punchData);
         }
         
         String json = JSONValue.toJSONString(jsonData);
         
         return json;
+        
     }
 }

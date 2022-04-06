@@ -127,4 +127,77 @@ public class Feature6 {
         
     }
     
+    // Team E tests
+    
+    @Test
+    public void testJSONTimeOut() {
+        
+        /* Expected JSON Data */
+        
+        String expectedJSON = "[{\"originaltimestamp\":\"TUE 09\\/11\\/2018 23:19:04\",\"badgeid\":\"021890C0\",\"adjustedtimestamp\":\"TUE 09\\/11\\/2018 23:15:00\",\"adjustmenttype\":\"Interval Round\",\"terminalid\":\"0\",\"id\":\"4181\",\"punchtype\":\"TIME OUT\"}]";
+        
+        ArrayList<HashMap<String, String>> expected = (ArrayList)JSONValue.parse(expectedJSON);
+		
+        /* Get Punch */
+        
+        Punch p = db.getPunch(4181);
+        Badge b = db.getBadge(p.getBadge().getId());
+        Shift s = db.getShift(b);
+        
+        /* Get Daily Punch List */
+        
+        ArrayList<Punch> dailypunchlist = db.getDailyPunchList(b, p.getOriginalTimestamp().toLocalDate());
+        
+        /* Adjust Punches */
+        
+        for (Punch punch : dailypunchlist) {
+            punch.adjust(s);
+        }
+        
+        /* JSON Conversion */
+        
+        String actualJSON = TAS.getPunchListAsJSON(dailypunchlist);
+        
+        ArrayList<HashMap<String, String>> actual = (ArrayList)JSONValue.parse(actualJSON);
+		
+        /* Compare to Expected JSON */
+        assertEquals(expected, actual);
+        
+    }
+    
+    @Test
+    public void testFourPunchWeekend() {
+        
+        /* Expected JSON Data */
+        
+        String expectedJSON = "[{\"originaltimestamp\":\"SAT 09\\/29\\/2018 05:54:45\",\"badgeid\":\"CB99D1E8\",\"adjustedtimestamp\":\"SAT 09\\/29\\/2018 06:00:00\",\"adjustmenttype\":\"Interval Round\",\"terminalid\":\"105\",\"id\":\"6351\",\"punchtype\":\"CLOCK IN\"}, {\"originaltimestamp\":\"SAT 09\\/29\\/2018 11:18:47\",\"badgeid\":\"CB99D1E8\",\"adjustedtimestamp\":\"SAT 09\\/29\\/2018 11:15:00\",\"adjustmenttype\":\"Interval Round\",\"terminalid\":\"105\",\"id\":\"6394\",\"punchtype\":\"CLOCK OUT\"}, {\"originaltimestamp\":\"SAT 09\\/29\\/2018 11:46:00\",\"badgeid\":\"CB99D1E8\",\"adjustedtimestamp\":\"SAT 09\\/29\\/2018 11:45:00\",\"adjustmenttype\":\"Interval Round\",\"terminalid\":\"105\",\"id\":\"6403\",\"punchtype\":\"CLOCK IN\"}, {\"originaltimestamp\":\"SAT 09\\/29\\/2018 12:01:52\",\"badgeid\":\"CB99D1E8\",\"adjustedtimestamp\":\"SAT 09\\/29\\/2018 12:00:00\",\"adjustmenttype\":\"Interval Round\",\"terminalid\":\"105\",\"id\":\"6434\",\"punchtype\":\"CLOCK OUT\"}]";
+        
+        ArrayList<HashMap<String, String>> expected = (ArrayList)JSONValue.parse(expectedJSON);
+		
+        /* Get Punch */
+        
+        Punch p = db.getPunch(6351);
+        Badge b = db.getBadge(p.getBadge().getId());
+        Shift s = db.getShift(b);
+        
+        /* Get Daily Punch List */
+        
+        ArrayList<Punch> dailypunchlist = db.getDailyPunchList(b, p.getOriginalTimestamp().toLocalDate());
+        
+        /* Adjust Punches */
+        
+        for (Punch punch : dailypunchlist) {
+            punch.adjust(s);
+        }
+        
+        /* JSON Conversion */
+        
+        String actualJSON = TAS.getPunchListAsJSON(dailypunchlist);
+        
+        ArrayList<HashMap<String, String>> actual = (ArrayList)JSONValue.parse(actualJSON);
+		
+        /* Compare to Expected JSON */
+        assertEquals(expected, actual);
+        
+    }
 }

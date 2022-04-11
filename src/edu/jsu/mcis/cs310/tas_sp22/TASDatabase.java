@@ -445,13 +445,30 @@ public class TASDatabase {
             return punchlist;
             
         }   
-    public ArrayList<Punch> getPayPeriodPunchList(Badge b, LocalDate d) 
+    public ArrayList<Punch> getPayPeriodPunchList(Badge b, LocalDate d, Shift s) 
     {
       ArrayList al = new ArrayList<Punch>(); 
       Punch punch;
+      LocalDate start = d; 
+      LocalDate end = d; 
       String query = null;
       ResultSet resultset = null;
       PreparedStatement pstmt = null;
+      if(d.getDayOfWeek() != DayOfWeek.SUNDAY)
+      {
+          while(start.getDayOfWeek() !=DayOfWeek.SUNDAY)
+          {
+              start = start.minusDays(1); 
+          }
+      }
+      
+      if(d.getDayOfWeek() != DayOfWeek.SUNDAY)
+      {
+          while(end.getDayOfWeek() !=DayOfWeek.SUNDAY)
+          {
+              end = end.plusDays(1); 
+          }
+      }
             
       boolean hasresults;
       String badgeID = b.getId();
@@ -461,9 +478,11 @@ public class TASDatabase {
       {
           if(connection.isValid(0))
           {
-              query = "SELECT"; 
+              query = "SELECT * FROM event WHERE badgeid = ? AND DATE(timestamp) BETWEEN CAST"
+                      + "(? AS DATE) AND CAST (? AS DATE) ORDER BY timestamp;"; 
               pstmt.setString(1, badgeID);
-              pstmt.setString(2, d.toString());
+              pstmt.setDate(2, Date.valueOf(start));
+              pstmt.setDate(2, Date.valueOf(end));
               
               hasresults = pstmt.execute(); 
               
@@ -475,6 +494,7 @@ public class TASDatabase {
                   {
                       punchID = resultset.getInt("id"); 
                       punch = getPunch(punchID); 
+                      punch.adjust(s);
                       al.add(punch); 
                   }
               }

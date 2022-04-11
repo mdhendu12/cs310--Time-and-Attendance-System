@@ -1,4 +1,5 @@
 package edu.jsu.mcis.cs310.tas_sp22;
+import java.util.ArrayList;
 
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -7,6 +8,10 @@ import java.util.Locale;
 import org.json.simple.*; 
 
 public class TAS {
+    public static double calculateAbseenism(ArrayList<Punch> pl, Shift S)
+        {
+            return b; 
+        }
     
     public static void main(String[] args) {
             

@@ -444,5 +444,50 @@ public class TASDatabase {
             
             return punchlist;
             
-        }              
+        }   
+    public ArrayList<Punch> getPayPeriodPunchList(Badge b, LocalDate d) 
+    {
+      ArrayList al = new ArrayList<Punch>(); 
+      Punch punch;
+      String query = null;
+      ResultSet resultset = null;
+      PreparedStatement pstmt = null;
+            
+      boolean hasresults;
+      String badgeID = b.getId();
+      int punchID;
+      
+      try 
+      {
+          if(connection.isValid(0))
+          {
+              query = "SELECT"; 
+              pstmt.setString(1, badgeID);
+              pstmt.setString(2, d.toString());
+              
+              hasresults = pstmt.execute(); 
+              
+              if (hasresults)
+              {
+                  resultset = pstmt.getResultSet(); 
+                  
+                  while(resultset.next())
+                  {
+                      punchID = resultset.getInt("id"); 
+                      punch = getPunch(punchID); 
+                      al.add(punch); 
+                  }
+              }
+          }
+      }
+      
+      catch (Exception e) { e.printStackTrace(); }    
+      return al; 
+    }
+    
+    public Absenteeism getAbsenteeism(Badge b, LocalDate d)
+    {
+       return ab; 
+    }
+    
 }

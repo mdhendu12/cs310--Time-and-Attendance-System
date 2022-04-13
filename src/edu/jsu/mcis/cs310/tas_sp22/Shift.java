@@ -9,21 +9,21 @@ public class Shift {
     private LocalTime shiftstart, shiftstop, lunchstart, lunchstop, lunchthreshold;
     private Duration shiftduration, lunchduration;
   
-     public Shift(String description, HashMap<String, Integer> integers, HashMap<String, LocalTime> localtimes) {
+    public Shift(String description, HashMap<String, Integer> integers, HashMap<String, LocalTime> localtimes) {
      
-     this.description = description; 
-     this.shiftstart = localtimes.get("shiftstart");
-     this.shiftstop = localtimes.get("shiftstop");
-     this.shiftduration = Duration.between(shiftstart, shiftstop);
-     this.roundinterval = integers.get("roundinterval");
-     this.graceperiod = integers.get("graceperiod");
-     this.dockpenalty = integers.get("dockpenalty");
-     this.lunchstart = localtimes.get("lunchstart");
-     this.lunchstop = localtimes.get("lunchstop");
-     this.lunchduration = Duration.between(lunchstart, lunchstop);
-     this.lunchthreshold = localtimes.get("shiftstart");
+        this.description = description; 
+        this.shiftstart = localtimes.get("shiftstart");
+        this.shiftstop = localtimes.get("shiftstop");
+        this.shiftduration = Duration.between(shiftstart, shiftstop);
+        this.roundinterval = integers.get("roundinterval");
+        this.graceperiod = integers.get("graceperiod");
+        this.dockpenalty = integers.get("dockpenalty");
+        this.lunchstart = localtimes.get("lunchstart");
+        this.lunchstop = localtimes.get("lunchstop");
+        this.lunchduration = Duration.between(lunchstart, lunchstop);
+        this.lunchthreshold = localtimes.get("shiftstart");
       
- }
+    }
 
     public String getDescription() {
         return description;

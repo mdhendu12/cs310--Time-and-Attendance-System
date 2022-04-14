@@ -420,6 +420,27 @@ public class TASDatabase {
         return shift;
         
     }
+    
+    public void insertAbsenteeism(Absenteeism ab) {
+        String badgeId = ab.getBadgeid();
+        String query;
+        LocalDate payPeriod = ab.getPayPeriod();
+        PreparedStatement pstmt = null;
+        boolean hasresults;
+        try {
+            query = "SELECT * FROM absenteeism a WHERE badgeid=? AND payperiod=?";
+            pstmt = connection.prepareStatement(query);
+            pstmt.setString(1, badgeId);
+            pstmt.setString(2, payPeriod.toString());
+            
+            hasresults = pstmt.execute();   
+            
+            if (hasresults) {
+                
+            }
+        }
+        catch (Exception e) { e.printStackTrace(); }
+    }
         
     public int insertPunch(Punch p) {
         int newID = 0; 
@@ -458,13 +479,13 @@ public class TASDatabase {
         return newID; 
     }
 
-    public ArrayList<Punch> getPayPeriodPunchList(Badge b, LocalDate d) 
+    public ArrayList<Punch> getPayPeriodPunchList(Badge b, LocalDate d, Shift s) 
     {
       ArrayList al = new ArrayList<Punch>(); 
       Punch punch;
       LocalDate start = d; 
       LocalDate end = d; 
-      String query = null;
+      String query;
       ResultSet resultset = null;
       PreparedStatement pstmt = null;
       if(d.getDayOfWeek() != DayOfWeek.SUNDAY)
@@ -493,9 +514,10 @@ public class TASDatabase {
           {
               query = "SELECT * FROM event WHERE badgeid = ? AND DATE(timestamp) BETWEEN CAST"
                       + "(? AS DATE) AND CAST (? AS DATE) ORDER BY timestamp;"; 
+              pstmt = connection.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS);
               pstmt.setString(1, badgeID);
               pstmt.setDate(2, Date.valueOf(start));
-              pstmt.setDate(2, Date.valueOf(end));
+              pstmt.setDate(3, Date.valueOf(end));
               
               hasresults = pstmt.execute(); 
               

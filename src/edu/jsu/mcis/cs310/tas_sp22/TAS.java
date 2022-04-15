@@ -9,7 +9,7 @@ public class TAS {
   
     }
     
-    protected static boolean clockedOutForLunch (Punch firstPunch, Punch secondPunch, Shift shift) {
+    private static boolean clockedOutForLunch (Punch firstPunch, Punch secondPunch, Shift shift) {
         
         boolean clockedOut;
         
@@ -27,7 +27,7 @@ public class TAS {
 
 }
     
-    protected static boolean punchTypesCorrect (Punch firstPunch, Punch secondPunch, Shift shift) {
+    private static boolean punchTypesCorrect (Punch firstPunch, Punch secondPunch, Shift shift) {
         
         boolean correct = false;
         String first = firstPunch.getPunchtype().toString();

@@ -1,4 +1,5 @@
 package edu.jsu.mcis.cs310.tas_sp22;
+
 import java.sql.*;
 import java.util.HashMap;
 import java.time.*;
@@ -19,39 +20,7 @@ public class TASDatabase {
         this.connection = openConnection(username, password, address);  // establish connection to sql server
         
     }
-    
-    public Punch getPunch(int punchID) {
-        Punch punch = null;
-        String query = "SELECT * FROM event e WHERE id=?";
-        boolean hasresults;
-        ResultSet resultset = null;
-        ResultSetMetaData rsmd = null;
-        HashMap<String, String> hm = new HashMap<String, String>();
-        
-        try {
-            PreparedStatement pstmt = connection.prepareStatement(query);
-            pstmt.setInt(1, punchID);
-            
-            hasresults = pstmt.execute();
-            if (hasresults) {
-                resultset = pstmt.getResultSet();
-                resultset.next();
-                rsmd = resultset.getMetaData();
-                
-                Badge badge = getBadge(resultset.getString("badgeid"));
-                
-                for (int i = 1; i <= rsmd.getColumnCount(); i++) {
-                    hm.put(rsmd.getColumnName(i), resultset.getString(i));  // key = table column header; value is row result
-                }
-                
-                punch = new Punch(hm, badge);  // new Punch object created with hashmap
-            }
-        }
-        catch (Exception e) { e.printStackTrace(); }
-        
-        return punch;
-    }
-    
+     
     private Connection openConnection(String u, String p, String a) {
         
         Connection c = null;
@@ -92,9 +61,9 @@ public class TASDatabase {
     {
         Badge outputBadge = null; 
         
-        String description = null; 
-        
+        String description = null;         
         String query = null; 
+        
         ResultSet resultset = null; 
         boolean hasresult;
         
@@ -191,60 +160,67 @@ public class TASDatabase {
     
     }
     
-        public Shift getShift(Badge badgeID) {
-        
-        /* Declaration/initialization of variables, shift object, and resultset. */    
+    public ArrayList<Punch> getDailyPunchList(Badge badge, LocalDate tsdate) {
             
-        Shift shift = null;
-        String ID = badgeID.getId();
-        int shiftID;
+        ArrayList punchlist = new ArrayList<Punch>();
+        Punch punch;
+        
         String query = null;
+        String badgeID = badge.getId();
+        
         ResultSet resultset = null;
         PreparedStatement pstmt = null;
-        boolean hasresults;
-        
-        /* Queries the database, receives the resultset, then calls getShift() (above) to create a shift object. */
-        
-        try{
+        boolean hasresults;       
+        int punchID;
+
+        try {
+
             if (connection.isValid(0)) {
-                
-                query = "SELECT * FROM employee WHERE badgeid = ?";
+                query = "SELECT *, DATE(`timestamp`) AS tsdate FROM event "
+                        + "WHERE badgeid = ? HAVING tsdate = ? ORDER BY `timestamp`;";
                 pstmt = connection.prepareStatement(query);
-                pstmt.setString(1, ID);
+                pstmt.setString(1, badgeID);
+                pstmt.setString(2, tsdate.toString());
+
                 hasresults = pstmt.execute();
-                
+
                 if (hasresults) {
-                    
+
                     resultset = pstmt.getResultSet();
-                    
+
                     while(resultset.next()) {
-                        
-                        shiftID = resultset.getInt("shiftid");
-                        shift = getShift(shiftID);
-                        
+
+                        punchID = resultset.getInt("id");
+                        punch = getPunch(punchID);
+                        punchlist.add(punch);
+
                     }
-                }  
+                }
+
             }
         }
-        
+
         catch (Exception e) { e.printStackTrace(); }
-        return shift;
-        
-    }
-        
+
+        return punchlist;
+
+    }    
+    
     public Department getDepartment(int id) {
         Department dept = null;
         String query = "SELECT * FROM department WHERE id=?";
+        String description;
+        
         boolean hasresults;
         ResultSet resultset = null;
         int terminalid;
-        String description;
         
         try {
             PreparedStatement pstmt = connection.prepareStatement(query);
             pstmt.setInt(1, id);
             
             hasresults = pstmt.execute();
+            
             if (hasresults) {
                 resultset = pstmt.getResultSet();
                 resultset.next();
@@ -265,15 +241,16 @@ public class TASDatabase {
         Employee employee = null;
         
         String badgeid, firstname, lastname, middlename;
+        String query = null;
+        
         LocalDate active, inactive; 
         int employeetypeid, departmentid, shiftid; 
-        String query = null;
         ResultSet resultset = null;
         boolean hasresults;
         
         try {
             
-            if ( connection.isValid(0) ) {
+            if (connection.isValid(0)) {
                 
                 query = "SELECT * FROM employee WHERE id=?";
                 PreparedStatement pstmt = connection.prepareStatement(query);
@@ -294,11 +271,12 @@ public class TASDatabase {
                     firstname = resultset.getString("firstname"); 
                     lastname = resultset.getString("lastname"); 
                     middlename= resultset.getString("middlename");
+                    
                     try
                     {
                          inactive = resultset.getTimestamp("inactive").toLocalDateTime().toLocalDate();
                     }
-                    catch(Exception e) {inactive = null;} 
+                    catch(Exception e) { inactive = null; } 
                     
                     HashMap<String, String> strings = new HashMap<>(); 
                     strings.put("badgeid",badgeid);
@@ -324,6 +302,7 @@ public class TASDatabase {
         }
         
         catch (Exception e) { e.printStackTrace(); }
+        
         return employee; 
     
     }
@@ -332,13 +311,14 @@ public class TASDatabase {
         
         Employee employee = null;
         String ID = badgeID.getId();
-        int employeeID;
         String query = null;
+        
+        int employeeID;      
         ResultSet resultset = null;
         PreparedStatement pstmt = null;
         boolean hasresults;
         
-        try{
+        try {
             if (connection.isValid(0)) {
                 
                 query = "SELECT * FROM employee WHERE badgeid = ?";
@@ -361,7 +341,147 @@ public class TASDatabase {
         }
         
         catch (Exception e) { e.printStackTrace(); }
+        
         return employee;
+        
+    }
+    
+    public Punch getPunch(int punchID) {
+        Punch punch = null;
+        String query = "SELECT * FROM event e WHERE id=?";
+        boolean hasresults;
+        ResultSet resultset = null;
+        ResultSetMetaData rsmd = null;
+        HashMap<String, String> hm = new HashMap<String, String>();
+        
+        try {
+            PreparedStatement pstmt = connection.prepareStatement(query);
+            pstmt.setInt(1, punchID);
+            
+            hasresults = pstmt.execute();
+            if (hasresults) {
+                resultset = pstmt.getResultSet();
+                resultset.next();
+                rsmd = resultset.getMetaData();
+                
+                Badge badge = getBadge(resultset.getString("badgeid"));
+                
+                for (int i = 1; i <= rsmd.getColumnCount(); i++) {
+                    // key = table column header; value is row result
+                    hm.put(rsmd.getColumnName(i), resultset.getString(i));  
+                }
+                
+                punch = new Punch(hm, badge);  // new Punch object created with hashmap
+            }
+        }
+        catch (Exception e) { e.printStackTrace(); }
+        
+        return punch;
+    }
+    
+    public Shift getShift(int id) {
+        
+        Shift shift = null;
+        
+        String description = null;
+        String query = null;
+        
+        int roundinterval, graceperiod, dockpenalty;
+        LocalTime shiftstart, shiftstop, lunchstart, lunchstop = null;     
+        ResultSet resultset = null;
+        boolean hasresults;
+        
+        /* Queries the database, receives a resultset and organizes the data in the resultset into different hashmaps before creating a shift object */
+        
+        try {
+            
+            if (connection.isValid(0)) {
+                
+                query = "SELECT * FROM shift WHERE id=?";
+                PreparedStatement pstmt = connection.prepareStatement(query);
+                pstmt.setInt(1, id);
+                hasresults = pstmt.execute();
+                
+                if ( hasresults ) {
+               
+                    resultset = pstmt.getResultSet();
+                    resultset.first();
+                    
+                    id = resultset.getInt("id");
+                    description = resultset.getString("description");
+                    shiftstart = resultset.getTimestamp("shiftstart").toLocalDateTime().toLocalTime();
+                    shiftstop = resultset.getTimestamp("shiftstop").toLocalDateTime().toLocalTime();
+                    roundinterval = resultset.getInt("roundinterval");
+                    graceperiod = resultset.getInt("graceperiod");
+                    dockpenalty = resultset.getInt("dockpenalty");
+                    lunchstart = resultset.getTimestamp("lunchstart").toLocalDateTime().toLocalTime();
+                    lunchstop = resultset.getTimestamp("lunchstop").toLocalDateTime().toLocalTime();
+                    
+                    HashMap<String, Integer> integers = new HashMap<>();
+                    integers.put("id", id);
+                    integers.put("roundinterval", roundinterval);
+                    integers.put("graceperiod", graceperiod);
+                    integers.put("dockpenalty", dockpenalty);
+                    
+                    HashMap<String, LocalTime> localtimes = new HashMap<>();
+                    localtimes.put("shiftstart", shiftstart);
+                    localtimes.put("shiftstop", shiftstop);
+                    localtimes.put("lunchstart", lunchstart);
+                    localtimes.put("lunchstop", lunchstop);
+                    
+                    shift = new Shift(description, integers, localtimes);
+                                        
+                }
+                
+            }
+        }
+        
+        catch (Exception e) { e.printStackTrace(); }
+        
+        return shift; 
+    
+    }
+    
+    public Shift getShift(Badge badgeID) {
+        
+        /* Declaration/initialization of variables, shift object, and resultset. */    
+            
+        Shift shift = null;
+        String ID = badgeID.getId();
+        String query = null;
+        
+        int shiftID;     
+        ResultSet resultset = null;
+        PreparedStatement pstmt = null;
+        boolean hasresults;
+        
+        /* Queries the database, receives the resultset, then calls getShift() (above) to create a shift object. */
+        
+        try {
+            if (connection.isValid(0)) {
+                
+                query = "SELECT * FROM employee WHERE badgeid = ?";
+                pstmt = connection.prepareStatement(query);
+                pstmt.setString(1, ID);
+                hasresults = pstmt.execute();
+                
+                if (hasresults) {
+                    
+                    resultset = pstmt.getResultSet();
+                    
+                    while(resultset.next()) {
+                        
+                        shiftID = resultset.getInt("shiftid");
+                        shift = getShift(shiftID);
+                        
+                    }
+                }  
+            }
+        }
+        
+        catch (Exception e) { e.printStackTrace(); }
+        
+        return shift;
         
     }
         
@@ -374,7 +494,7 @@ public class TASDatabase {
         String query;
         ResultSet resultset; 
         
-        if(p.getTerminalid() == department.getTerminalid() || p.getTerminalid() ==0)
+        if (p.getTerminalid() == department.getTerminalid() || p.getTerminalid() == 0)
         {
             try 
             {
@@ -387,7 +507,7 @@ public class TASDatabase {
                 
                 int result = pstmt.executeUpdate(); 
                 
-                if (result ==1)
+                if (result == 1)
                 {
                     resultset = pstmt.getGeneratedKeys(); 
                     if (resultset.next())
@@ -398,53 +518,8 @@ public class TASDatabase {
             }
             catch (Exception e) {e.printStackTrace();} 
         }
+        
         return newID; 
     }
-
-        
-    public ArrayList<Punch> getDailyPunchList(Badge badge, LocalDate tsdate) {
-            
-            ArrayList punchlist = new ArrayList<Punch>();
-            Punch punch;
-            String query = null;
-            ResultSet resultset = null;
-            PreparedStatement pstmt = null;
-            
-            boolean hasresults;
-            String badgeID = badge.getId();
-            int punchID;
-            
-            
-            try{
-                
-                if (connection.isValid(0)) {
-                    query = "SELECT *, DATE(`timestamp`) AS tsdate FROM event "
-                            + "WHERE badgeid = ? HAVING tsdate = ? ORDER BY `timestamp`;";
-                    pstmt = connection.prepareStatement(query);
-                    pstmt.setString(1, badgeID);
-                    pstmt.setString(2, tsdate.toString());
-                    
-                    hasresults = pstmt.execute();
-                    
-                    if (hasresults) {
-                    
-                        resultset = pstmt.getResultSet();
-
-                        while(resultset.next()) {
-                            
-                            punchID = resultset.getInt("id");
-                            punch = getPunch(punchID);
-                            punchlist.add(punch);
-                            
-                        }
-                    }
-
-                }
-            }
-            
-            catch (Exception e) { e.printStackTrace(); }
-            
-            return punchlist;
-            
-        }              
+         
 }

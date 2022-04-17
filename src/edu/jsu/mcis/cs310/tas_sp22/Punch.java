@@ -30,7 +30,6 @@ public class Punch {
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         timestamp = LocalDateTime.parse(params.get("timestamp"), dtf).withNano(0);
         
-
         id = Integer.valueOf(params.get("id"));
         terminalid = Integer.valueOf(params.get("terminalid"));
         eventtypeid = PunchType.values()[Integer.parseInt(params.get("eventtypeid"))];
@@ -62,7 +61,6 @@ public class Punch {
         int roundinterval = s.getRoundinterval();
         
         if (!"TIME OUT".equals(eventString) && isntweekend) {
-                       
             //None Rule
            
             int intervalRound = s.getRoundinterval();
@@ -112,6 +110,7 @@ public class Punch {
             //Dock Penalty Rule
             
             int dockPenalty = s.getDockpenalty();
+            
             LocalTime inDockInterval = shiftstart.plusMinutes(graceperiod);
             LocalTime endInDockInterval = shiftstart.plusMinutes(dockPenalty);
             LocalTime outDockInterval = shiftstop.minusMinutes(graceperiod);
@@ -131,7 +130,7 @@ public class Punch {
                 adjustmenttype = "Shift Dock";
             }
             
-            if (adjustmenttype == null) {adjuster = intervalRound(adjuster, s);}
+            if (adjustmenttype == null) { adjuster = intervalRound(adjuster, s); }
             
             adjustedTS = timestamp;
             
@@ -151,39 +150,39 @@ public class Punch {
         
     }
     
-    private LocalTime intervalRound(LocalTime adjuster, Shift s) {
-                
-                int intervalRound = s.getRoundinterval();
-                adjustmenttype = "Interval Round";
-                int minute = timestamp.getMinute();
-                int adjustedminute;
-                             
-                //Interval Round Rule
-                
-                if (minute % intervalRound !=0) {
-                    
-                    if ((minute % intervalRound) < (intervalRound/2)) {
-                        adjustedminute = (Math.round(minute/intervalRound) * intervalRound);
-                    }
-                    
-                    else {
-                        adjustedminute = (Math.round(minute/intervalRound) * intervalRound) + intervalRound;
-                    }
-                    
-                    if (adjustedminute != 60) {
-                        adjuster = timestamp.toLocalTime().withMinute(adjustedminute); 
-                    }
-                    
-                    else {
-                        adjuster = timestamp.toLocalTime().plusHours(1).withMinute(0);
-                    }
-         
-                    adjuster = adjuster.withSecond(0);
-                    
-                }
-                
-                return adjuster;
-                
+    private LocalTime intervalRound(LocalTime adjuster, Shift s) {               
+        int intervalRound = s.getRoundinterval();       
+        int minute = timestamp.getMinute();
+        int adjustedminute;
+        
+        adjustmenttype = "Interval Round";
+
+        //Interval Round Rule
+
+        if (minute % intervalRound !=0) {
+
+            if ((minute % intervalRound) < (intervalRound/2)) {
+                adjustedminute = (Math.round(minute/intervalRound) * intervalRound);
+            }
+
+            else {
+                adjustedminute = (Math.round(minute/intervalRound) * intervalRound) + intervalRound;
+            }
+
+            if (adjustedminute != 60) {
+                adjuster = timestamp.toLocalTime().withMinute(adjustedminute); 
+            }
+
+            else {
+                adjuster = timestamp.toLocalTime().plusHours(1).withMinute(0);
+            }
+
+            adjuster = adjuster.withSecond(0);
+
+        }
+
+        return adjuster;
+
     }
     
     @Override
@@ -196,8 +195,10 @@ public class Punch {
         
         sb.append("#").append(badgeid).append(" ");
         sb.append(eventtypeid);
-        sb.append(": ").append(timestamp.getDayOfWeek().toString().substring(0, 3)).append(" ");    // substring is used to shorten day of week string (e.g. "THURSDAY" -> "THU")
-        sb.append(DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm:ss").format(timestamp));    // format timestamp properly for output
+        // substring is used to shorten day of week string (e.g. "THURSDAY" -> "THU")
+        sb.append(": ").append(timestamp.getDayOfWeek().toString().substring(0, 3)).append(" ");
+        // format timestamp properly for output
+        sb.append(DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm:ss").format(timestamp));    
         
         return sb.toString();
     }
@@ -206,8 +207,10 @@ public class Punch {
         
         sb.append("#").append(badgeid).append(" ");
         sb.append(eventtypeid);
-        sb.append(": ").append(adjustedTS.getDayOfWeek().toString().substring(0, 3)).append(" ");    // substring is used to shorten day of week string (e.g. "THURSDAY" -> "THU")
-        sb.append(DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm:ss").format(adjustedTS));    // format timestamp properly for output
+        // substring is used to shorten day of week string (e.g. "THURSDAY" -> "THU")
+        sb.append(": ").append(adjustedTS.getDayOfWeek().toString().substring(0, 3)).append(" ");  
+        // format timestamp properly for output
+        sb.append(DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm:ss").format(adjustedTS));    
         sb.append(" (").append(adjustmenttype).append(")");
         
         return sb.toString();

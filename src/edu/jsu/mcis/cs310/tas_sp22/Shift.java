@@ -21,7 +21,7 @@ public class Shift {
         this.lunchstart = localtimes.get("lunchstart");
         this.lunchstop = localtimes.get("lunchstop");
         this.lunchduration = Duration.between(lunchstart, lunchstop);
-        this.lunchthreshold = localtimes.get("shiftstart");
+        this.lunchthreshold = integers.get("lunchthreshold");
       
     }
 

@@ -31,7 +31,7 @@ public class TAS {
         
         return clockedOut;
 
-}
+    }
     
     private static boolean punchTypesCorrect (Punch firstPunch, Punch secondPunch, Shift shift) {
         
@@ -114,8 +114,6 @@ public class TAS {
         return totalMinutes;
         
         }
-            
-    }
           
     public static String getPunchListAsJSON(ArrayList<Punch> dailypunchlist) {
         

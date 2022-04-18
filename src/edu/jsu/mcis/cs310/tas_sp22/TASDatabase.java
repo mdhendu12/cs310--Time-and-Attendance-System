@@ -512,8 +512,8 @@ public class TASDatabase {
       {
           if(connection.isValid(0))
           {
-              query = "SELECT * FROM event WHERE badgeid = ? AND DATE(timestamp) BETWEEN CAST"
-                      + "(? AS DATE) AND CAST (? AS DATE) ORDER BY timestamp;"; 
+              query = "SELECT * FROM event WHERE badgeid = ? AND DATE(timestamp) BETWEEN"
+                      +" ? AND ? ORDER BY timestamp;"; 
               pstmt = connection.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS);
               pstmt.setString(1, badgeID);
               pstmt.setDate(2, Date.valueOf(start));

@@ -15,7 +15,7 @@ public class TAS {
   
     }
     
-    private static boolean clockedOutForLunch (Punch firstPunch, Punch secondPunch, Shift shift) {
+    private static boolean clockedOutForLunch (Punch firstPunch, Punch secondPunch) {
         
         boolean clockedOut;
         
@@ -33,15 +33,15 @@ public class TAS {
 
     }
     
-    private static boolean punchTypesCorrect (Punch firstPunch, Punch secondPunch, Shift shift) {
+    private static boolean punchTypesCorrect (Punch firstPunch, Punch secondPunch) {
         
         boolean correct = false;
         String first = firstPunch.getPunchtype().toString();
         String second = secondPunch.getPunchtype().toString();
         
         if (first != "CLOCK IN" || second != "CLOCK OUT") {
-                    correct = false;
-                }
+            correct = false;
+        }
         
         else {correct = true;}
         
@@ -49,7 +49,7 @@ public class TAS {
         
     }
     
-    public static int calculateTotalMinutes(ArrayList<Punch> dailypunchlist, Shift shift) {
+    public static int calculateTotalMinutes(ArrayList<Punch> dailypunchlist, Shift s) {
         
         int totalMinutes = 0;
         Punch firstPunch = null;
@@ -76,7 +76,7 @@ public class TAS {
                     else {break;}
                 }
 
-                correct = punchTypesCorrect(firstPunch, secondPunch, shift);
+                correct = punchTypesCorrect(firstPunch, secondPunch);
 
                 if (!correct) {
                     firstPunch = secondPunch;
@@ -84,7 +84,7 @@ public class TAS {
                 }
 
                 else {
-                    clockedOut = clockedOutForLunch(firstPunch, secondPunch, shift);
+                    clockedOut = clockedOutForLunch(firstPunch, secondPunch);
                     correct = false;
                 }
                 
@@ -99,7 +99,7 @@ public class TAS {
 
                     else {
                         minutes = Duration.between(firstPunch.getAdjustedTS(), secondPunch.getAdjustedTS());
-                        totalMinutes += (minutes.toMinutes() - shift.getLunchduration().toMinutes());
+                        totalMinutes += (minutes.toMinutes() - s.getLunchduration().toMinutes());
                     }
 
                 }
@@ -116,7 +116,7 @@ public class TAS {
         }
           
     public static String getPunchListAsJSON(ArrayList<Punch> dailypunchlist) {
-        
+        // Written by Matthew
         ArrayList<HashMap<String, String>> jsonData = new ArrayList<HashMap<String, String>>();
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("E MM/dd/yyyy HH:mm:ss");
         

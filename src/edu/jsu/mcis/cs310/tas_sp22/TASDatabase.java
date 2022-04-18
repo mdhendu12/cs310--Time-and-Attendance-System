@@ -143,6 +143,7 @@ public class TASDatabase {
     }    
     
     public Department getDepartment(int id) {
+        // Matthew Henderson
         Department dept = null;
         String query = "SELECT * FROM department WHERE id=?";
         String description;
@@ -283,6 +284,7 @@ public class TASDatabase {
     }
     
     public Punch getPunch(int punchID) {
+        // Written by Matthew
         Punch punch = null;
         String query = "SELECT * FROM event e WHERE id=?";
         boolean hasresults;
@@ -423,6 +425,7 @@ public class TASDatabase {
     }
         
     public int insertPunch(Punch p) {
+        // Written by Matthew
         int newID = 0; 
         Badge badge = getBadge(p.getBadge().getId()); 
         Employee employee = getEmployee(badge); 

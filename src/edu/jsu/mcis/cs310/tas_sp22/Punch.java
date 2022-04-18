@@ -43,6 +43,7 @@ public class Punch {
     
     public void adjust(Shift s) {
         String day = timestamp.getDayOfWeek().toString();
+        String eventString = eventtypeid.toString();
         
         LocalTime time = timestamp.toLocalTime();
         LocalTime shiftstart = s.getShiftstart();
@@ -55,23 +56,21 @@ public class Punch {
         
         Boolean inlunchbreak = time.isAfter(lunchstart) && time.isBefore(lunchstop);
         Boolean isntweekend = !"SATURDAY".equals(day) && !"SUNDAY".equals(day);
-        
-        String eventString = eventtypeid.toString();
-        
+          
         int roundinterval = s.getRoundinterval();
         
         if (!"TIME OUT".equals(eventString) && isntweekend) {
-            //None Rule
            
             int intervalRound = s.getRoundinterval();
             
+            //None Rule
             if (timestamp.getMinute() % intervalRound == 0) {
                 adjuster = timestamp.toLocalTime().withSecond(0);
                 adjustmenttype = "None";
             }
             
             // Shift start rule
-            if (time.isBefore(shiftstart) && time.isAfter(shiftstart.minusMinutes(roundinterval))) { 
+            else if (time.isBefore(shiftstart) && time.isAfter(shiftstart.minusMinutes(roundinterval))) { 
                 adjuster = shiftstart;
                 adjustmenttype = "Shift Start";
             }
@@ -202,7 +201,9 @@ public class Punch {
         
         return sb.toString();
     }
+    
     public String printAdjusted() {
+        // Written by Matthew
         StringBuilder sb = new StringBuilder();
         
         sb.append("#").append(badgeid).append(" ");

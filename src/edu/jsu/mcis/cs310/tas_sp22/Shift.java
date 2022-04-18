@@ -14,7 +14,7 @@ public class Shift {
         this.description = description; 
         this.shiftstart = localtimes.get("shiftstart");
         this.shiftstop = localtimes.get("shiftstop");
-        this.shiftduration = Duration.between(shiftstart, shiftstop);
+        this.shiftduration = (Duration.between(shiftstart, shiftstop));
         this.roundinterval = integers.get("roundinterval");
         this.graceperiod = integers.get("graceperiod");
         this.dockpenalty = integers.get("dockpenalty");

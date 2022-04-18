@@ -18,7 +18,7 @@ public class TAS {
         TASDatabase db;
         db = new TASDatabase();
         
-        Punch p = db.getPunch(3634);
+        Punch p = db.getPunch(4943);
         Badge b = p.getBadge();
         Shift s = db.getShift(b);
         
@@ -28,7 +28,7 @@ public class TAS {
         ArrayList<Punch> punchlist = db.getPayPeriodPunchList(b, ts.toLocalDate(), s);
         
         for (Punch punch : punchlist) {
-            System.out.println(punch);
+            System.out.println(punch.printAdjusted());
         }
         
         
@@ -164,15 +164,48 @@ public class TAS {
         
     }
     
-    public static double calculateAbsenteeism(ArrayList<Punch> p1, Shift s)
-        {
-            double absenteeism = 0;
-            
-            int temp = calculateTotalMinutes(p1, s);
-            int total = calculateTotalMinutes(p1, s);
-            System.out.println(total);
-//absenteeism = (temp/total) * 100;
-            return absenteeism; 
-        }
+    public static double calculateAbsenteeism(ArrayList<Punch> p1, Shift s) {
     
+        double absenteeism;
+        
+        int minutesWorked = calculateTotalMinutes(p1, s);
+        double totalMinutes;
+        int shiftDays = 5; //shiftDays(p1);  FOR NOW, FIVE IS CONSTANT. PERSONALLY I WOULD NOT DO IT THIS WAY, HENCE THE EXTRA FUNCTION BELOW.
+        
+        totalMinutes = s.getShiftduration().toMinutes() - s.getLunchduration().toMinutes();
+        totalMinutes = totalMinutes * shiftDays;
+            
+        absenteeism = 100 - (minutesWorked/totalMinutes) * 100;
+        System.out.println(absenteeism);
+        return absenteeism; 
+        
+    }
+
+    public static int shiftDays (ArrayList<Punch> p1) {
+     
+     int shiftDays = 0;
+     Iterator<Punch> it = p1.iterator();
+     String day;
+     String previousDay = null;
+     boolean weekend = true;
+     
+     while (it.hasNext()) {
+        
+        Punch punch = it.next();
+        day = punch.getOriginalTimestamp().getDayOfWeek().toString();
+        
+        if (day != "SATURDAY" && day != "SUNDAY") {weekend = false;}
+        
+        else {weekend = true;}
+            
+        
+        if (!weekend && day != previousDay) {
+            shiftDays += 1;
+            previousDay = day;
+        }
+    }
+
+    return shiftDays;
+}   
+
 }

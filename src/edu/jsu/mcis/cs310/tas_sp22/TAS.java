@@ -1,12 +1,10 @@
 package edu.jsu.mcis.cs310.tas_sp22;
+
 import java.util.*;
 import java.time.*;
-import org.junit.Before;
-
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Locale;
 import org.json.simple.*; 
 
 public class TAS {
@@ -113,11 +111,11 @@ public class TAS {
         
         return totalMinutes;
         
-        }
+    }
           
     public static String getPunchListAsJSON(ArrayList<Punch> dailypunchlist) {
         // Written by Matthew
-        ArrayList<HashMap<String, String>> jsonData = new ArrayList<HashMap<String, String>>();
+        ArrayList<HashMap<String, String>> jsonData = new ArrayList<>();
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("E MM/dd/yyyy HH:mm:ss");
         
         for (Punch p : dailypunchlist) {

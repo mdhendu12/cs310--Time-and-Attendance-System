@@ -4,9 +4,9 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
-import java.lang.Math;
 
 public class Punch {
+    
     private int id, terminalid;
     private PunchType eventtypeid;
     private String adjustmenttype, badgeid;
@@ -160,12 +160,12 @@ public class Punch {
 
         if (minute % intervalRound !=0) {
 
-            if ((minute % intervalRound) < (intervalRound/2)) {
+            if ((minute % intervalRound) < (intervalRound / 2)) {
                 adjustedminute = (Math.round(minute/intervalRound) * intervalRound);
             }
 
             else {
-                adjustedminute = (Math.round(minute/intervalRound) * intervalRound) + intervalRound;
+                adjustedminute = (Math.round(minute / intervalRound) * intervalRound) + intervalRound;
             }
 
             if (adjustedminute != 60) {

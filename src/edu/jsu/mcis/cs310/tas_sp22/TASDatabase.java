@@ -3,7 +3,11 @@ package edu.jsu.mcis.cs310.tas_sp22;
 import java.sql.*;
 import java.util.HashMap;
 import java.time.*;
+import java.time.temporal.TemporalField;
+import java.time.temporal.WeekFields;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Locale;
 
 public class TASDatabase {
     
@@ -427,16 +431,34 @@ public class TASDatabase {
         LocalDate payPeriod = ab.getPayPeriod();
         PreparedStatement pstmt = null;
         boolean hasresults;
+        double percentage = ab.getPercentage();
+        TemporalField fieldUS = WeekFields.of(Locale.US).dayOfWeek();
+        LocalDate payPeriodSunday = payPeriod.with(fieldUS, Calendar.SUNDAY);
+
         try {
             query = "SELECT * FROM absenteeism a WHERE badgeid=? AND payperiod=?";
             pstmt = connection.prepareStatement(query);
             pstmt.setString(1, badgeId);
-            pstmt.setString(2, payPeriod.toString());
+            pstmt.setDate(2, java.sql.Date.valueOf(payPeriodSunday));
             
             hasresults = pstmt.execute();   
-            
-            if (hasresults) {
-                
+            System.out.println(badgeId + " " + java.sql.Date.valueOf(payPeriodSunday) + " " + percentage);
+
+            if (!hasresults) {
+                query = "INSERT INTO absenteeism (badgeid, payperiod, percentage) VALUES (?, ?, ?)";
+                pstmt = connection.prepareStatement(query);
+                pstmt.setString(1, badgeId);
+                pstmt.setDate(2, java.sql.Date.valueOf(payPeriodSunday));
+                pstmt.setDouble(3, percentage);
+                pstmt.executeUpdate();
+            }
+            else {
+                query = "UPDATE absenteeism SET payperiod=?, percentage=? WHERE badgeid=?";
+                pstmt = connection.prepareStatement(query);
+                pstmt.setDate(1, java.sql.Date.valueOf(payPeriodSunday));
+                pstmt.setDouble(2, percentage);
+                pstmt.setString(3, badgeId);              
+                pstmt.executeUpdate();
             }
         }
         catch (Exception e) { e.printStackTrace(); }

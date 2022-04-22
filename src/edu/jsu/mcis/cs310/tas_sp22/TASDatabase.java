@@ -436,30 +436,18 @@ public class TASDatabase {
         LocalDate payPeriodSunday = payPeriod.with(fieldUS, Calendar.SUNDAY);
 
         try {
-            query = "SELECT * FROM absenteeism a WHERE badgeid=? AND payperiod=?";
+            query = "DELETE FROM absenteeism WHERE badgeid=? AND payperiod=?";
             pstmt = connection.prepareStatement(query);
             pstmt.setString(1, badgeId);
             pstmt.setDate(2, java.sql.Date.valueOf(payPeriodSunday));
+            pstmt.execute();
             
-            hasresults = pstmt.execute();   
-            System.out.println(badgeId + " " + java.sql.Date.valueOf(payPeriodSunday) + " " + percentage);
-
-            if (!hasresults) {
-                query = "INSERT INTO absenteeism (badgeid, payperiod, percentage) VALUES (?, ?, ?)";
-                pstmt = connection.prepareStatement(query);
-                pstmt.setString(1, badgeId);
-                pstmt.setDate(2, java.sql.Date.valueOf(payPeriodSunday));
-                pstmt.setDouble(3, percentage);
-                pstmt.executeUpdate();
-            }
-            else {
-                query = "UPDATE absenteeism SET payperiod=?, percentage=? WHERE badgeid=?";
-                pstmt = connection.prepareStatement(query);
-                pstmt.setDate(1, java.sql.Date.valueOf(payPeriodSunday));
-                pstmt.setDouble(2, percentage);
-                pstmt.setString(3, badgeId);              
-                pstmt.executeUpdate();
-            }
+            query = "INSERT INTO absenteeism (badgeid, payperiod, percentage) VALUES (?, ?, ?)";
+            pstmt = connection.prepareStatement(query);
+            pstmt.setString(1, badgeId);
+            pstmt.setDate(2, java.sql.Date.valueOf(payPeriodSunday));
+            pstmt.setDouble(3, percentage);
+            pstmt.executeUpdate();
         }
         catch (Exception e) { e.printStackTrace(); }
     }

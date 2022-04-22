@@ -71,15 +71,8 @@ public class Punch {
             }
             
             // Shift start rule
-            if (time.isBefore(shiftstart) && time.isAfter(shiftstart.minusMinutes(roundinterval))) { 
-                adjuster = shiftstart;
-                adjustmenttype = "Shift Start";
-            }
-            else if (time.isAfter(shiftstop) && time.isBefore(shiftstop.plusMinutes(roundinterval))) { 
-                adjuster = shiftstop;
-                adjustmenttype = "Shift Stop";
-            }
-            else if (inlunchbreak) {
+            
+            if (inlunchbreak) {
                 if ("CLOCK OUT".equals(eventString)) { 
                     adjuster = lunchstart;
                     adjustmenttype = "Lunch Start";
@@ -88,6 +81,14 @@ public class Punch {
                     adjuster = lunchstop; 
                     adjustmenttype = "Lunch Stop";
                 }
+            }
+            else if (time.isAfter(shiftstop) && time.isBefore(shiftstop.plusMinutes(roundinterval))) { 
+                adjuster = shiftstop;
+                adjustmenttype = "Shift Stop";
+            }
+            else if (time.isBefore(shiftstart) && time.isAfter(shiftstart.minusMinutes(roundinterval))) { 
+                adjuster = shiftstart;
+                adjustmenttype = "Shift Start";
             }
             //Grace Period Rule
             

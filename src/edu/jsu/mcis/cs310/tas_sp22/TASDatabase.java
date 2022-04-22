@@ -322,7 +322,7 @@ public class TASDatabase {
         String description = null;
         String query = null;
         
-        int roundinterval, graceperiod, dockpenalty;
+        int roundinterval, graceperiod, dockpenalty, lunchthreshold;
         LocalTime shiftstart, shiftstop, lunchstart, lunchstop = null;     
         ResultSet resultset = null;
         boolean hasresults;
@@ -352,12 +352,14 @@ public class TASDatabase {
                     dockpenalty = resultset.getInt("dockpenalty");
                     lunchstart = resultset.getTimestamp("lunchstart").toLocalDateTime().toLocalTime();
                     lunchstop = resultset.getTimestamp("lunchstop").toLocalDateTime().toLocalTime();
+                    lunchthreshold = resultset.getInt("lunchthreshold");
                     
                     HashMap<String, Integer> integers = new HashMap<>();
                     integers.put("id", id);
                     integers.put("roundinterval", roundinterval);
                     integers.put("graceperiod", graceperiod);
                     integers.put("dockpenalty", dockpenalty);
+                    integers.put("lunchthreshold", lunchthreshold);
                     
                     HashMap<String, LocalTime> localtimes = new HashMap<>();
                     localtimes.put("shiftstart", shiftstart);

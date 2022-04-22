@@ -36,9 +36,25 @@ public class TAS {
         
         double percentage = TAS.calculateAbsenteeism(punchlist, s);
     
+
+//        Punch p = db.getPunch(1087);
+//        Badge b = p.getBadge();
+//        Shift s = db.getShift(b);
+//        
+//        ArrayList<Punch> dailypunchlist = db.getDailyPunchList(b, p.getOriginalTimestamp().toLocalDate());
+//        
+//        for (Punch punch : dailypunchlist) {
+//            punch.adjust(s);
+//            System.out.println(punch.printAdjusted());
+//        }
+//		
+//        /* Compute Pay Period Total */
+//        
+//        int m = TAS.calculateTotalMinutes(dailypunchlist, s);
+        
     }
     
-    private static boolean clockedOutForLunch (Punch firstPunch, Punch secondPunch, Shift shift) {
+    private static boolean clockedOutForLunch (Punch firstPunch, Punch secondPunch) {
         
         boolean clockedOut;
         
@@ -56,7 +72,7 @@ public class TAS {
 
     }
     
-    private static boolean punchTypesCorrect (Punch firstPunch, Punch secondPunch, Shift shift) {
+    private static boolean punchTypesCorrect (Punch firstPunch, Punch secondPunch) {
         
         boolean correct = false;
         String first = firstPunch.getPunchtype().toString();
@@ -99,7 +115,7 @@ public class TAS {
                     else {break;}
                 }
 
-                correct = punchTypesCorrect(firstPunch, secondPunch, shift);
+                correct = punchTypesCorrect(firstPunch, secondPunch);
 
                 if (!correct) {
                     firstPunch = secondPunch;
@@ -107,28 +123,22 @@ public class TAS {
                 }
 
                 else {
-                    clockedOut = clockedOutForLunch(firstPunch, secondPunch, shift);
+                    clockedOut = clockedOutForLunch(firstPunch, secondPunch);
                     correct = false;
                 }
                 
+                minutes = Duration.between(firstPunch.getAdjustedTS(), secondPunch.getAdjustedTS());
                 String day = secondPunch.getOriginalTimestamp().getDayOfWeek().toString();
-        
-                if (day != "SATURDAY" && day != "SUNDAY") {
-                    
-                    if (clockedOut) {
-                        minutes = Duration.between(firstPunch.getAdjustedTS(), secondPunch.getAdjustedTS());
-                        totalMinutes += minutes.toMinutes();
-                    }
+           
+                if (clockedOut) {
+                    totalMinutes += minutes.toMinutes();
+                }
 
-                    else {
-                        minutes = Duration.between(firstPunch.getAdjustedTS(), secondPunch.getAdjustedTS());
-                        totalMinutes += (minutes.toMinutes() - shift.getLunchduration().toMinutes());
-                    }
-
+                else if (minutes.toMinutes() > shift.getLunchthreshold())  {
+                    totalMinutes += (minutes.toMinutes() - shift.getLunchduration().toMinutes());
                 }
                 
-                else {
-                    minutes = Duration.between(firstPunch.getAdjustedTS(), secondPunch.getAdjustedTS());
+                else {   
                     totalMinutes += minutes.toMinutes();
                 }
             }

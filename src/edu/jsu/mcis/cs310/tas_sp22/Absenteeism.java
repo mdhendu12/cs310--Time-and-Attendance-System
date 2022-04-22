@@ -39,7 +39,7 @@ public class Absenteeism {
     {
         StringBuilder sb = new StringBuilder(); 
         sb.append("#").append(badgeid).append(" (Pay Period Starting ").append(payPeriod).append("): ");
-        sb.append(percentage).append("%"); 
+        sb.append(String.format("%.2f%%", percentage)); 
         return sb.toString(); 
     }
     

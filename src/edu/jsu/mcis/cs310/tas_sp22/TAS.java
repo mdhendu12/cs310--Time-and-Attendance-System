@@ -1,20 +1,15 @@
 package edu.jsu.mcis.cs310.tas_sp22;
 import java.time.Duration;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Locale;
 import org.json.simple.*; 
 
 public class TAS {
     
     public static void main(String[] args) {
-
+         
     }
     
     private static boolean clockedOutForLunch (Punch firstPunch, Punch secondPunch) {
@@ -143,13 +138,13 @@ public class TAS {
         
         int minutesWorked = calculateTotalMinutes(p1, s);
         double totalMinutes;
-        int shiftDays = 5; //For the purposes of this feature, it is to be assumed 5.
+        int shiftDays = 5; //shiftDays(p1);  FOR NOW, FIVE IS CONSTANT. PERSONALLY I WOULD NOT DO IT THIS WAY, HENCE THE EXTRA FUNCTION BELOW.
         
         totalMinutes = s.getShiftduration().toMinutes() - s.getLunchduration().toMinutes();
         totalMinutes = totalMinutes * shiftDays;
             
         absenteeism = 100 - (minutesWorked/totalMinutes) * 100;
-        System.out.println(absenteeism);
+        System.out.println(String.format("%.2f%%", absenteeism));
         return absenteeism; 
         
     }

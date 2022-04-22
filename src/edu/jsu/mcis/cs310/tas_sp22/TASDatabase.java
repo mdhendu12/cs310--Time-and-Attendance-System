@@ -3,7 +3,11 @@ package edu.jsu.mcis.cs310.tas_sp22;
 import java.sql.*;
 import java.util.HashMap;
 import java.time.*;
+import java.time.temporal.TemporalField;
+import java.time.temporal.WeekFields;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Locale;
 
 public class TASDatabase {
     
@@ -429,17 +433,23 @@ public class TASDatabase {
         LocalDate payPeriod = ab.getPayPeriod();
         PreparedStatement pstmt = null;
         boolean hasresults;
+        double percentage = ab.getPercentage();
+        TemporalField fieldUS = WeekFields.of(Locale.US).dayOfWeek();
+        LocalDate payPeriodSunday = payPeriod.with(fieldUS, Calendar.SUNDAY);
+
         try {
-            query = "SELECT * FROM absenteeism a WHERE badgeid=? AND payperiod=?";
+            query = "DELETE FROM absenteeism WHERE badgeid=? AND payperiod=?";
             pstmt = connection.prepareStatement(query);
             pstmt.setString(1, badgeId);
-            pstmt.setString(2, payPeriod.toString());
+            pstmt.setDate(2, java.sql.Date.valueOf(payPeriodSunday));
+            pstmt.execute();
             
-            hasresults = pstmt.execute();   
-            
-            if (hasresults) {
-                
-            }
+            query = "INSERT INTO absenteeism (badgeid, payperiod, percentage) VALUES (?, ?, ?)";
+            pstmt = connection.prepareStatement(query);
+            pstmt.setString(1, badgeId);
+            pstmt.setDate(2, java.sql.Date.valueOf(payPeriodSunday));
+            pstmt.setDouble(3, percentage);
+            pstmt.executeUpdate();
         }
         catch (Exception e) { e.printStackTrace(); }
     }

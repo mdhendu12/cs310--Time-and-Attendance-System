@@ -13,6 +13,12 @@ public class Absenteeism {
         this.percentage = percent; 
     }
     
+    public Absenteeism (Badge b, LocalDate date, double percent) {
+        this.badgeid = b.getId();
+        this.payPeriod = date;
+        this.percentage = percent;
+    }
+    
     public String getBadgeid()
     {
         return badgeid; 

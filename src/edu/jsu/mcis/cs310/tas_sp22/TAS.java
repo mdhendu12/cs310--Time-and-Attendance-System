@@ -14,44 +14,7 @@ import org.json.simple.*;
 public class TAS {
     
     public static void main(String[] args) {
-        
-        TASDatabase db;
-        db = new TASDatabase();
-        
-        Punch p = db.getPunch(4943);
-        Badge b = p.getBadge();
-        Shift s = db.getShift(b);
-        
-        /* Get Pay Period Punch List */
-        
-        LocalDateTime ts = p.getOriginalTimestamp();
-        ArrayList<Punch> punchlist = db.getPayPeriodPunchList(b, ts.toLocalDate(), s);
-        
-        for (Punch punch : punchlist) {
-            System.out.println(punch.printAdjusted());
-        }
-        
-        
-        /* Compute Pay Period Total Absenteeism */
-        
-        double percentage = TAS.calculateAbsenteeism(punchlist, s);
-    
 
-//        Punch p = db.getPunch(1087);
-//        Badge b = p.getBadge();
-//        Shift s = db.getShift(b);
-//        
-//        ArrayList<Punch> dailypunchlist = db.getDailyPunchList(b, p.getOriginalTimestamp().toLocalDate());
-//        
-//        for (Punch punch : dailypunchlist) {
-//            punch.adjust(s);
-//            System.out.println(punch.printAdjusted());
-//        }
-//		
-//        /* Compute Pay Period Total */
-//        
-//        int m = TAS.calculateTotalMinutes(dailypunchlist, s);
-        
     }
     
     private static boolean clockedOutForLunch (Punch firstPunch, Punch secondPunch) {
@@ -180,7 +143,7 @@ public class TAS {
         
         int minutesWorked = calculateTotalMinutes(p1, s);
         double totalMinutes;
-        int shiftDays = 5; //shiftDays(p1);  FOR NOW, FIVE IS CONSTANT. PERSONALLY I WOULD NOT DO IT THIS WAY, HENCE THE EXTRA FUNCTION BELOW.
+        int shiftDays = 5; //For the purposes of this feature, it is to be assumed 5.
         
         totalMinutes = s.getShiftduration().toMinutes() - s.getLunchduration().toMinutes();
         totalMinutes = totalMinutes * shiftDays;
@@ -190,32 +153,4 @@ public class TAS {
         return absenteeism; 
         
     }
-
-    public static int shiftDays (ArrayList<Punch> p1) {
-     
-     int shiftDays = 0;
-     Iterator<Punch> it = p1.iterator();
-     String day;
-     String previousDay = null;
-     boolean weekend = true;
-     
-     while (it.hasNext()) {
-        
-        Punch punch = it.next();
-        day = punch.getOriginalTimestamp().getDayOfWeek().toString();
-        
-        if (day != "SATURDAY" && day != "SUNDAY") {weekend = false;}
-        
-        else {weekend = true;}
-            
-        
-        if (!weekend && day != previousDay) {
-            shiftDays += 1;
-            previousDay = day;
-        }
-    }
-
-    return shiftDays;
-}   
-
 }

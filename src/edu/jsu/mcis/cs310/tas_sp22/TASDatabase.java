@@ -431,7 +431,7 @@ public class TASDatabase {
         String badgeId = ab.getBadgeid();
         String query;
         LocalDate payPeriod = ab.getPayPeriod();
-        PreparedStatement pstmt = null;
+        //PreparedStatement pstmt = null;
         boolean hasresults;
         double percentage = ab.getPercentage();
         TemporalField fieldUS = WeekFields.of(Locale.US).dayOfWeek();
@@ -439,17 +439,19 @@ public class TASDatabase {
 
         try {
             query = "DELETE FROM absenteeism WHERE badgeid=? AND payperiod=?";
-            pstmt = connection.prepareStatement(query);
+            PreparedStatement pstmt = connection.prepareStatement(query);
             pstmt.setString(1, badgeId);
             pstmt.setDate(2, java.sql.Date.valueOf(payPeriodSunday));
             pstmt.execute();
             
+            System.err.println("*** badgeID: " + badgeId);
+            
             query = "INSERT INTO absenteeism (badgeid, payperiod, percentage) VALUES (?, ?, ?)";
-            pstmt = connection.prepareStatement(query);
-            pstmt.setString(1, badgeId);
-            pstmt.setDate(2, java.sql.Date.valueOf(payPeriodSunday));
-            pstmt.setDouble(3, percentage);
-            pstmt.executeUpdate();
+            PreparedStatement pstmt2 = connection.prepareStatement(query);
+            pstmt2.setString(1, badgeId.trim());
+            pstmt2.setDate(2, java.sql.Date.valueOf(payPeriodSunday));
+            pstmt2.setDouble(3, percentage);
+            pstmt2.executeUpdate();
         }
         catch (Exception e) { e.printStackTrace(); }
     }

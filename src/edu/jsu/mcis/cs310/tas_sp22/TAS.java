@@ -138,13 +138,12 @@ public class TAS {
         
         int minutesWorked = calculateTotalMinutes(p1, s);
         double totalMinutes;
-        int shiftDays = 5; //shiftDays(p1);  FOR NOW, FIVE IS CONSTANT. PERSONALLY I WOULD NOT DO IT THIS WAY, HENCE THE EXTRA FUNCTION BELOW.
+        int shiftDays = 5;
         
         totalMinutes = s.getShiftduration().toMinutes() - s.getLunchduration().toMinutes();
         totalMinutes = totalMinutes * shiftDays;
             
         absenteeism = 100 - (minutesWorked/totalMinutes) * 100;
-        System.out.println(String.format("%.2f%%", absenteeism));
         return absenteeism; 
         
     }

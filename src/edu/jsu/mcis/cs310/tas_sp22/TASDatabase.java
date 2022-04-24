@@ -443,9 +443,7 @@ public class TASDatabase {
             pstmt.setString(1, badgeId);
             pstmt.setDate(2, java.sql.Date.valueOf(payPeriodSunday));
             pstmt.execute();
-            
-            System.err.println("*** badgeID: " + badgeId);
-            
+                        
             query = "INSERT INTO absenteeism (badgeid, payperiod, percentage) VALUES (?, ?, ?)";
             PreparedStatement pstmt2 = connection.prepareStatement(query);
             pstmt2.setString(1, badgeId.trim());
@@ -556,39 +554,39 @@ public class TASDatabase {
     
     public Absenteeism getAbsenteeism(Badge b, LocalDate d)
     {
-       Absenteeism ab = null; 
-       
-       String badgeid; 
-       LocalDate payPeriod; 
-       double percentage; 
-       LocalDate start = d; 
-       LocalDate end = d; 
-       String ID = b.getId(); 
+        Absenteeism ab = null; 
+
+        String badgeid; 
+        LocalDate payPeriod; 
+        double percentage; 
+        LocalDate start = d; 
+        LocalDate end = d; 
+        String ID = b.getId(); 
         if(d.getDayOfWeek() != DayOfWeek.SUNDAY)
-      {
-          while(start.getDayOfWeek() !=DayOfWeek.SUNDAY)
-          {
-              start = start.minusDays(1); 
-          }
-      }
+        {
+            while(start.getDayOfWeek() !=DayOfWeek.SUNDAY)
+            {
+                start = start.minusDays(1); 
+            }
+        }
       
-      if(d.getDayOfWeek() != DayOfWeek.SUNDAY)
-      {
-          while(end.getDayOfWeek() !=DayOfWeek.SUNDAY)
-          {
-              end = end.plusDays(1); 
-          }
-      }
+        if(d.getDayOfWeek() != DayOfWeek.SUNDAY)
+        {
+            while(end.getDayOfWeek() !=DayOfWeek.SUNDAY)
+            {
+                end = end.plusDays(1); 
+            }
+        }
        
-       String query = null;
-       ResultSet resultset = null;
-       boolean hasresult;
+        String query = null;
+        ResultSet resultset = null;
+        boolean hasresult;
         try 
         {
             if (connection.isValid(0))
             {
-                query = "SELECT * FROM event WHERE badgeid = ? AND DATE(timestamp) BETWEEN"
-                      +" ? AND ? ORDER BY timestamp;"; 
+                query = "SELECT * FROM absenteeism WHERE badgeid = ? AND DATE(payperiod) BETWEEN"
+                      +" ? AND ? ORDER BY payperiod;"; 
                 PreparedStatement pstmt = connection.prepareStatement(query);
                 pstmt.setString(1, ID);
                 pstmt.setDate(2, Date.valueOf(start));
@@ -598,12 +596,12 @@ public class TASDatabase {
                 if (hasresult) 
                 {
                     resultset = pstmt.getResultSet(); 
-                    resultset.first(); 
+                    //resultset.first(); 
+                    resultset.next();
                     
                     badgeid = resultset.getString("badgeid"); 
-                    payPeriod = resultset.getTimestamp("paypPeriod").toLocalDateTime().toLocalDate(); 
-                    percentage = resultset.getDouble("percentage"); 
-           
+                    payPeriod = resultset.getDate("payperiod").toLocalDate();
+                    percentage = resultset.getDouble("percentage");
                     ab = new Absenteeism(badgeid, payPeriod, percentage); 
                 }
             }

@@ -142,11 +142,18 @@ public class Punch {
         }
         
         else {
-            
             adjuster = intervalRound(adjuster, s);
-            adjustedTS = adjustedTS.withHour(adjuster.getHour());
-            adjustedTS = adjustedTS.withMinute(adjuster.getMinute());
-            adjustedTS = adjustedTS.withSecond(adjuster.getSecond());
+            if (adjuster != null) {
+               adjustedTS = adjustedTS.withHour(adjuster.getHour());
+               adjustedTS = adjustedTS.withMinute(adjuster.getMinute());
+               adjustedTS = adjustedTS.withSecond(adjuster.getSecond()); 
+            }
+            else {/*
+                System.out.println(adjuster.getHour());
+                adjustedTS = adjustedTS.withHour(adjuster.getHour());
+               adjustedTS = adjustedTS.withMinute(adjuster.getMinute());
+               adjustedTS = adjustedTS.withSecond(adjuster.getSecond()); */
+            }
                 
         }
         
@@ -156,13 +163,12 @@ public class Punch {
         int intervalRound = s.getRoundinterval();       
         int minute = timestamp.getMinute();
         int adjustedminute;
-        
+        //System.out.println(intervalRound + " " + minute + " ");
         adjustmenttype = "Interval Round";
 
         //Interval Round Rule
 
         if (minute % intervalRound !=0) {
-
             if ((minute % intervalRound) < (intervalRound/2)) {
                 adjustedminute = (Math.round(minute/intervalRound) * intervalRound);
             }
@@ -172,16 +178,22 @@ public class Punch {
             }
 
             if (adjustedminute != 60) {
-                adjuster = timestamp.toLocalTime().withMinute(adjustedminute); 
+                adjuster = timestamp.toLocalTime().withMinute(adjustedminute);
             }
 
             else {
-                adjuster = timestamp.toLocalTime().plusHours(1).withMinute(0);
+                adjuster = timestamp.toLocalTime().plusHours(1).withMinute(0); 
             }
 
             adjuster = adjuster.withSecond(0);
 
+        }/*
+        else if (minute == 0) {
+            System.out.println(timestamp.toLocalTime().toString() + " " + adjuster);
+            //adjuster = timestamp.toLocalTime().withSecond(0);
         }
+        */
+                            //System.out.println("adjuster: " + adjuster + "\n" + "shift: " + s + "\n");
 
         return adjuster;
 

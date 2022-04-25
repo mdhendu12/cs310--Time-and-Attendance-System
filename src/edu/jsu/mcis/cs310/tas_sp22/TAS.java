@@ -9,7 +9,7 @@ import org.json.simple.*;
 public class TAS {
     
     public static void main(String[] args) {
-         
+
     }
     
     private static boolean clockedOutForLunch (Punch firstPunch, Punch secondPunch) {
@@ -107,8 +107,8 @@ public class TAS {
         }
           
     public static String getPunchListAsJSON(ArrayList<Punch> dailypunchlist) {
-        
-        ArrayList<HashMap<String, String>> jsonData = new ArrayList<HashMap<String, String>>();
+        // Written by Matthew
+        ArrayList<HashMap<String, String>> jsonData = new ArrayList<>();
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("E MM/dd/yyyy HH:mm:ss");
         
         for (Punch p : dailypunchlist) {

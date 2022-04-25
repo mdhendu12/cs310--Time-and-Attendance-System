@@ -147,6 +147,7 @@ public class TASDatabase {
     }    
     
     public Department getDepartment(int id) {
+        // Matthew Henderson
         Department dept = null;
         String query = "SELECT * FROM department WHERE id=?";
         String description;
@@ -287,6 +288,7 @@ public class TASDatabase {
     }
     
     public Punch getPunch(int punchID) {
+        // Written by Matthew
         Punch punch = null;
         String query = "SELECT * FROM event e WHERE id=?";
         boolean hasresults;
@@ -318,16 +320,59 @@ public class TASDatabase {
         
         return punch;
     }
+        
+    public Shift getShift(Badge badgeID) {
+        
+        /* Declaration/initialization of variables, shift object, and resultset. */    
+            
+        Shift shift = null;
+        String ID = badgeID.getId();
+        String query = null;
+        
+        int shiftID;     
+        ResultSet resultset = null;
+        PreparedStatement pstmt = null;
+        boolean hasresults;
+        
+        /* Queries the database, receives the resultset, then calls getShift() (above) to create a shift object. */
+        
+        try {
+            if (connection.isValid(0)) {
+                
+                query = "SELECT * FROM employee WHERE badgeid = ?";
+                pstmt = connection.prepareStatement(query);
+                pstmt.setString(1, ID);
+                hasresults = pstmt.execute();
+                
+                if (hasresults) {
+                    
+                    resultset = pstmt.getResultSet();
+                    
+                    while(resultset.next()) {
+                        
+                        shiftID = resultset.getInt("shiftid");
+                        shift = getShift(shiftID);
+                        
+                    }
+                }  
+            }
+        }
+        
+        catch (Exception e) { e.printStackTrace(); }
+        
+        return shift;
+        
+    }
     
     public Shift getShift(int id) {
         
         Shift shift = null;
         
         String description = null;
-        String query = null;
-        
         int roundinterval, graceperiod, dockpenalty, lunchthreshold;
-        LocalTime shiftstart, shiftstop, lunchstart, lunchstop = null;     
+        LocalTime shiftstart, shiftstop, lunchstart, lunchstop = null;
+        
+        String query = null;
         ResultSet resultset = null;
         boolean hasresults;
         
@@ -335,7 +380,7 @@ public class TASDatabase {
         
         try {
             
-            if (connection.isValid(0)) {
+            if ( connection.isValid(0) ) {
                 
                 query = "SELECT * FROM shift WHERE id=?";
                 PreparedStatement pstmt = connection.prepareStatement(query);
@@ -379,7 +424,6 @@ public class TASDatabase {
         }
         
         catch (Exception e) { e.printStackTrace(); }
-        
         return shift; 
     
     }
@@ -453,8 +497,10 @@ public class TASDatabase {
         }
         catch (Exception e) { e.printStackTrace(); }
     }
+
         
     public int insertPunch(Punch p) {
+        // Written by Matthew
         int newID = 0; 
         Badge badge = getBadge(p.getBadge().getId()); 
         Employee employee = getEmployee(badge); 

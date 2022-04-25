@@ -4,9 +4,9 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
-import java.lang.Math;
 
 public class Punch {
+    
     private int id, terminalid;
     private PunchType eventtypeid;
     private String adjustmenttype, badgeid;
@@ -43,6 +43,7 @@ public class Punch {
     
     public void adjust(Shift s) {
         String day = timestamp.getDayOfWeek().toString();
+        String eventString = eventtypeid.toString();
         
         LocalTime time = timestamp.toLocalTime();
         LocalTime shiftstart = s.getShiftstart();
@@ -55,16 +56,14 @@ public class Punch {
         
         Boolean inlunchbreak = time.isAfter(lunchstart) && time.isBefore(lunchstop);
         Boolean isntweekend = !"SATURDAY".equals(day) && !"SUNDAY".equals(day);
-        
-        String eventString = eventtypeid.toString();
-        
+          
         int roundinterval = s.getRoundinterval();
         
         if (!"TIME OUT".equals(eventString) && isntweekend) {
-            //None Rule
            
             int intervalRound = s.getRoundinterval();
             
+            //None Rule
             if (timestamp.getMinute() % intervalRound == 0) {
                 adjuster = timestamp.toLocalTime().withSecond(0);
                 adjustmenttype = "None";
@@ -142,18 +141,10 @@ public class Punch {
         }
         
         else {
-            adjuster = intervalRound(adjuster, s);
-            if (adjuster != null) {
-               adjustedTS = adjustedTS.withHour(adjuster.getHour());
-               adjustedTS = adjustedTS.withMinute(adjuster.getMinute());
-               adjustedTS = adjustedTS.withSecond(adjuster.getSecond()); 
-            }
-            else {/*
-                System.out.println(adjuster.getHour());
-                adjustedTS = adjustedTS.withHour(adjuster.getHour());
-               adjustedTS = adjustedTS.withMinute(adjuster.getMinute());
-               adjustedTS = adjustedTS.withSecond(adjuster.getSecond()); */
-            }
+            adjuster = intervalRound(timestamp.toLocalTime(), s);
+            adjustedTS = adjustedTS.withHour(adjuster.getHour());
+            adjustedTS = adjustedTS.withMinute(adjuster.getMinute());
+            adjustedTS = adjustedTS.withSecond(adjuster.getSecond());
                 
         }
         
@@ -169,12 +160,13 @@ public class Punch {
         //Interval Round Rule
 
         if (minute % intervalRound !=0) {
-            if ((minute % intervalRound) < (intervalRound/2)) {
+
+            if ((minute % intervalRound) < (intervalRound / 2)) {
                 adjustedminute = (Math.round(minute/intervalRound) * intervalRound);
             }
 
             else {
-                adjustedminute = (Math.round(minute/intervalRound) * intervalRound) + intervalRound;
+                adjustedminute = (Math.round(minute / intervalRound) * intervalRound) + intervalRound;
             }
 
             if (adjustedminute != 60) {
@@ -186,14 +178,6 @@ public class Punch {
             }
 
             adjuster = adjuster.withSecond(0);
-
-        }/*
-        else if (minute == 0) {
-            System.out.println(timestamp.toLocalTime().toString() + " " + adjuster);
-            //adjuster = timestamp.toLocalTime().withSecond(0);
-        }
-        */
-                            //System.out.println("adjuster: " + adjuster + "\n" + "shift: " + s + "\n");
 
         return adjuster;
 
@@ -216,7 +200,9 @@ public class Punch {
         
         return sb.toString();
     }
+    
     public String printAdjusted() {
+        // Written by Matthew
         StringBuilder sb = new StringBuilder();
         
         sb.append("#").append(badgeid).append(" ");

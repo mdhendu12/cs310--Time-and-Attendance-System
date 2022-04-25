@@ -146,4 +146,36 @@ public class Feature7 {
 
         assertEquals("#08D01475 (Pay Period Starting 09-09-2018): -19.38%", a2.toString());
     }
+    
+     @Test
+    public void testAbsenteeismPayPeriod() {
+                
+        /* Get Punch */
+        
+        Punch p = db.getPunch(4181); //
+        String b = p.getBadge().getId();
+        Shift s = db.getShift(p.getBadge());
+        
+        /* Get Pay Period Punch List */
+        
+        LocalDateTime ts = p.getOriginalTimestamp();
+        ArrayList<Punch> punchlist = db.getPayPeriodPunchList(p.getBadge(), ts.toLocalDate(), s);
+       
+        /* Compute Pay Period Total Absenteeism */
+        
+        double percentage = TAS.calculateAbsenteeism(punchlist, s);
+        
+        /* Insert Absenteeism Into Database */
+        
+        Absenteeism a1 = new Absenteeism(b, ts.toLocalDate(), percentage);
+        db.insertAbsenteeism(a1);
+        
+        /* Retrieve Absenteeism From Database */
+        
+        Absenteeism a2 = db.getAbsenteeism(p.getBadge(), ts.toLocalDate());
+        
+        /* Compare to Expected Value */
+
+        assertEquals("#021890C0 (Pay Period Starting 09-09-2018): 17.50%", a2.toString());
+    }
 }

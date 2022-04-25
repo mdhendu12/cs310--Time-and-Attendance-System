@@ -1,16 +1,15 @@
 package edu.jsu.mcis.cs310.tas_sp22;
-
-import java.util.*;
-import java.time.*;
+import java.time.Duration;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import org.json.simple.*; 
 
 public class TAS {
     
     public static void main(String[] args) {
-  
+
     }
     
     private static boolean clockedOutForLunch (Punch firstPunch, Punch secondPunch) {
@@ -38,8 +37,8 @@ public class TAS {
         String second = secondPunch.getPunchtype().toString();
         
         if (first != "CLOCK IN" || second != "CLOCK OUT") {
-            correct = false;
-        }
+                    correct = false;
+                }
         
         else {correct = true;}
         
@@ -47,7 +46,7 @@ public class TAS {
         
     }
     
-    public static int calculateTotalMinutes(ArrayList<Punch> dailypunchlist, Shift s) {
+    public static int calculateTotalMinutes(ArrayList<Punch> dailypunchlist, Shift shift) {
         
         int totalMinutes = 0;
         Punch firstPunch = null;
@@ -86,24 +85,18 @@ public class TAS {
                     correct = false;
                 }
                 
+                minutes = Duration.between(firstPunch.getAdjustedTS(), secondPunch.getAdjustedTS());
                 String day = secondPunch.getOriginalTimestamp().getDayOfWeek().toString();
-        
-                if (day != "SATURDAY" && day != "SUNDAY") {
-                    
-                    if (clockedOut) {
-                        minutes = Duration.between(firstPunch.getAdjustedTS(), secondPunch.getAdjustedTS());
-                        totalMinutes += minutes.toMinutes();
-                    }
+           
+                if (clockedOut) {
+                    totalMinutes += minutes.toMinutes();
+                }
 
-                    else {
-                        minutes = Duration.between(firstPunch.getAdjustedTS(), secondPunch.getAdjustedTS());
-                        totalMinutes += (minutes.toMinutes() - s.getLunchduration().toMinutes());
-                    }
-
+                else if (minutes.toMinutes() > shift.getLunchthreshold())  {
+                    totalMinutes += (minutes.toMinutes() - shift.getLunchduration().toMinutes());
                 }
                 
-                else {
-                    minutes = Duration.between(firstPunch.getAdjustedTS(), secondPunch.getAdjustedTS());
+                else {   
                     totalMinutes += minutes.toMinutes();
                 }
             }
@@ -111,7 +104,7 @@ public class TAS {
         
         return totalMinutes;
         
-    }
+        }
           
     public static String getPunchListAsJSON(ArrayList<Punch> dailypunchlist) {
         // Written by Matthew
@@ -138,8 +131,20 @@ public class TAS {
         return json;
         
     }
-}
-
+    
+    public static double calculateAbsenteeism(ArrayList<Punch> p1, Shift s) {
+    
+        double absenteeism;
         
-    
-    
+        int minutesWorked = calculateTotalMinutes(p1, s);
+        double totalMinutes;
+        int shiftDays = 5;
+        
+        totalMinutes = s.getShiftduration().toMinutes() - s.getLunchduration().toMinutes();
+        totalMinutes = totalMinutes * shiftDays;
+            
+        absenteeism = 100 - (minutesWorked/totalMinutes) * 100;
+        return absenteeism; 
+        
+    }
+}

@@ -70,15 +70,8 @@ public class Punch {
             }
             
             // Shift start rule
-            else if (time.isBefore(shiftstart) && time.isAfter(shiftstart.minusMinutes(roundinterval))) { 
-                adjuster = shiftstart;
-                adjustmenttype = "Shift Start";
-            }
-            else if (time.isAfter(shiftstop) && time.isBefore(shiftstop.plusMinutes(roundinterval))) { 
-                adjuster = shiftstop;
-                adjustmenttype = "Shift Stop";
-            }
-            else if (inlunchbreak) {
+            
+            if (inlunchbreak) {
                 if ("CLOCK OUT".equals(eventString)) { 
                     adjuster = lunchstart;
                     adjustmenttype = "Lunch Start";
@@ -87,6 +80,14 @@ public class Punch {
                     adjuster = lunchstop; 
                     adjustmenttype = "Lunch Stop";
                 }
+            }
+            else if (time.isAfter(shiftstop) && time.isBefore(shiftstop.plusMinutes(roundinterval))) { 
+                adjuster = shiftstop;
+                adjustmenttype = "Shift Stop";
+            }
+            else if (time.isBefore(shiftstart) && time.isAfter(shiftstart.minusMinutes(roundinterval))) { 
+                adjuster = shiftstart;
+                adjustmenttype = "Shift Start";
             }
             //Grace Period Rule
             
@@ -153,7 +154,7 @@ public class Punch {
         int intervalRound = s.getRoundinterval();       
         int minute = timestamp.getMinute();
         int adjustedminute;
-        
+        //System.out.println(intervalRound + " " + minute + " ");
         adjustmenttype = "Interval Round";
 
         //Interval Round Rule
@@ -169,16 +170,14 @@ public class Punch {
             }
 
             if (adjustedminute != 60) {
-                adjuster = timestamp.toLocalTime().withMinute(adjustedminute); 
+                adjuster = timestamp.toLocalTime().withMinute(adjustedminute);
             }
 
             else {
-                adjuster = timestamp.toLocalTime().plusHours(1).withMinute(0);
+                adjuster = timestamp.toLocalTime().plusHours(1).withMinute(0); 
             }
 
             adjuster = adjuster.withSecond(0);
-
-        }
 
         return adjuster;
 

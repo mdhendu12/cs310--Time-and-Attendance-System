@@ -427,50 +427,7 @@ public class TASDatabase {
         return shift; 
     
     }
-    
-    public Shift getShift(Badge badgeID) {
-        
-        /* Declaration/initialization of variables, shift object, and resultset. */    
-            
-        Shift shift = null;
-        String ID = badgeID.getId();
-        String query = null;
-        
-        int shiftID;     
-        ResultSet resultset = null;
-        PreparedStatement pstmt = null;
-        boolean hasresults;
-        
-        /* Queries the database, receives the resultset, then calls getShift() (above) to create a shift object. */
-        
-        try {
-            if (connection.isValid(0)) {
-                
-                query = "SELECT * FROM employee WHERE badgeid = ?";
-                pstmt = connection.prepareStatement(query);
-                pstmt.setString(1, ID);
-                hasresults = pstmt.execute();
-                
-                if (hasresults) {
-                    
-                    resultset = pstmt.getResultSet();
-                    
-                    while(resultset.next()) {
-                        
-                        shiftID = resultset.getInt("shiftid");
-                        shift = getShift(shiftID);
-                        
-                    }
-                }  
-            }
-        }
-        
-        catch (Exception e) { e.printStackTrace(); }
-        
-        return shift;
-        
-    }
-    
+      
     public void insertAbsenteeism(Absenteeism ab) {
         String badgeId = ab.getBadgeid();
         String query;

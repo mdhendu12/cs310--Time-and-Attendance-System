@@ -179,6 +179,7 @@ public class Punch {
 
             adjuster = adjuster.withSecond(0);
 
+        }
         return adjuster;
 
     }
@@ -187,7 +188,7 @@ public class Punch {
     public String toString() {
         return printOriginal();
     }
-    
+       
     public String printOriginal() {
         StringBuilder sb = new StringBuilder();
         

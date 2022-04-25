@@ -148,7 +148,7 @@ public class Feature7 {
     }
     
      @Test
-    public void testAbsenteeismPayPeriod() {
+    public void testAbsenteeismPayPeriodWithTimeOutPunch() {
                 
         /* Get Punch */
         
@@ -160,6 +160,10 @@ public class Feature7 {
         
         LocalDateTime ts = p.getOriginalTimestamp();
         ArrayList<Punch> punchlist = db.getPayPeriodPunchList(p.getBadge(), ts.toLocalDate(), s);
+        
+        for (Punch pu : punchlist) {
+            System.out.println(pu.printAdjusted());
+        }
        
         /* Compute Pay Period Total Absenteeism */
         

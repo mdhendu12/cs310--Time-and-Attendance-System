@@ -154,7 +154,6 @@ public class Punch {
         int intervalRound = s.getRoundinterval();       
         int minute = timestamp.getMinute();
         int adjustedminute;
-        //System.out.println(intervalRound + " " + minute + " ");
         adjustmenttype = "Interval Round";
 
         //Interval Round Rule
@@ -203,7 +202,7 @@ public class Punch {
     }
     
     public String printAdjusted() {
-        // Written by Matthew
+        
         StringBuilder sb = new StringBuilder();
         
         sb.append("#").append(badgeid).append(" ");

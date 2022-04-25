@@ -1,4 +1,5 @@
 package edu.jsu.mcis.cs310.tas_sp22;
+
 import java.time.Duration;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -37,8 +38,8 @@ public class TAS {
         String second = secondPunch.getPunchtype().toString();
         
         if (first != "CLOCK IN" || second != "CLOCK OUT") {
-                    correct = false;
-                }
+            correct = false;
+        }
         
         else {correct = true;}
         
@@ -104,10 +105,10 @@ public class TAS {
         
         return totalMinutes;
         
-        }
+    }
           
     public static String getPunchListAsJSON(ArrayList<Punch> dailypunchlist) {
-        // Written by Matthew
+        
         ArrayList<HashMap<String, String>> jsonData = new ArrayList<>();
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("E MM/dd/yyyy HH:mm:ss");
         
